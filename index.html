@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECW - E-Commerce Website</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+    <h2>ECW</h2>
+
+    <nav>
+        <button onclick="showSection('home')">Home</button>
+        <button onclick="showSection('products')">Products</button>
+        <button onclick="showSection('cart')">
+            Cart (<span id="cartCount">0</span>)
+        </button>
+        <button onclick="showSection('orders')">Orders</button>
+    </nav>
+</header>
+
+<main>
+
+    <!-- HOME -->
+    <section id="home">
+        <div class="hero">
+            <h1>Welcome to ECW</h1>
+            <p>Your simple online shopping destination.</p>
+            <button class="btn" onclick="showSection('products')">
+                Shop Now
+            </button>
+        </div>
+    </section>
+
+    <!-- PRODUCTS -->
+    <section id="products" class="hidden">
+        <h1>Our Products</h1>
+
+        <div class="filters">
+            <input
+                type="text"
+                id="search"
+                placeholder="Search products..."
+                oninput="displayProducts()"
+            >
+
+            <select id="category" onchange="displayProducts()">
+                <option value="All">All Categories</option>
+                <option value="Mobiles">Mobiles</option>
+                <option value="Laptops">Laptops</option>
+                <option value="Watches">Watches</option>
+                <option value="Shoes">Shoes</option>
+                <option value="Accessories">Accessories</option>
+            </select>
+        </div>
+
+        <div id="productList" class="product-grid"></div>
+    </section>
+
+    <!-- CART -->
+    <section id="cart" class="hidden">
+        <h1>Shopping Cart</h1>
+
+        <div id="cartList"></div>
+
+        <div id="cartTotal" class="total"></div>
+    </section>
+
+    <!-- CHECKOUT -->
+    <section id="checkout" class="hidden">
+        <h1>Checkout</h1>
+
+        <form id="checkoutForm">
+
+            <label>Name</label>
+            <input type="text" id="name" required>
+
+            <label>Phone</label>
+            <input type="tel" id="phone" maxlength="10" required>
+
+            <label>Address</label>
+            <textarea id="address" required></textarea>
+
+            <label>City</label>
+            <input type="text" id="city" required>
+
+            <label>PIN Code</label>
+            <input type="text" id="pincode" maxlength="6" required>
+
+            <h3 id="checkoutTotal"></h3>
+
+            <button class="btn" type="submit">
+                Place Order - Cash on Delivery
+            </button>
+
+        </form>
+    </section>
+
+    <!-- ORDERS -->
+    <section id="orders" class="hidden">
+        <h1>My Orders</h1>
+
+        <div id="orderList"></div>
+    </section>
+
+</main>
+
+<footer>
+    <p>© 2026 ECW. All Rights Reserved.</p>
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+</html>
