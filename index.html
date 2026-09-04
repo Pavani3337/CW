@@ -1,116 +1,450 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ECW - E-Commerce Website</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ECW | Everything You Need</title>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <header>
-    <h2>ECW</h2>
+    <div class="logo">
+        <span>✦</span> ECW
+    </div>
 
     <nav>
         <button onclick="showSection('home')">Home</button>
         <button onclick="showSection('products')">Products</button>
         <button onclick="showSection('cart')">
-            Cart (<span id="cartCount">0</span>)
+            🛒 Cart <b id="cartCount">0</b>
         </button>
         <button onclick="showSection('orders')">Orders</button>
+        <button id="ownerBtn" onclick="showSection('owner')" class="owner-btn">
+            Owner
+        </button>
+        <button id="loginBtn" onclick="showAuth('login')">
+            Login
+        </button>
     </nav>
 </header>
 
+
 <main>
 
-    <!-- HOME -->
-    <section id="home">
-        <div class="hero">
-            <h1>Welcome to ECW</h1>
-            <p>Your simple online shopping destination.</p>
-            <button class="btn" onclick="showSection('products')">
-                Shop Now
+<!-- HOME -->
+<section id="home">
+
+    <div class="hero">
+
+        <div class="hero-text">
+            <p class="tag">✨ SIMPLE • SMART • SECURE</p>
+
+            <h1>
+                Shopping Made
+                <span>Beautiful.</span>
+            </h1>
+
+            <p>
+                Discover amazing products, enjoy smooth shopping
+                and experience ECW.
+            </p>
+
+            <button class="primary" onclick="showSection('products')">
+                Explore Products →
             </button>
         </div>
-    </section>
 
-    <!-- PRODUCTS -->
-    <section id="products" class="hidden">
-        <h1>Our Products</h1>
-
-        <div class="filters">
-            <input
-                type="text"
-                id="search"
-                placeholder="Search products..."
-                oninput="displayProducts()"
-            >
-
-            <select id="category" onchange="displayProducts()">
-                <option value="All">All Categories</option>
-                <option value="Mobiles">Mobiles</option>
-                <option value="Laptops">Laptops</option>
-                <option value="Watches">Watches</option>
-                <option value="Shoes">Shoes</option>
-                <option value="Accessories">Accessories</option>
-            </select>
+        <div class="hero-art">
+            <div class="circle c1"></div>
+            <div class="circle c2"></div>
+            <div class="shopping-card">
+                🛍️
+                <strong>ECW</strong>
+                <small>Smart Shopping</small>
+            </div>
         </div>
 
-        <div id="productList" class="product-grid"></div>
-    </section>
+    </div>
 
-    <!-- CART -->
-    <section id="cart" class="hidden">
-        <h1>Shopping Cart</h1>
+    <div class="features">
 
-        <div id="cartList"></div>
+        <div>
+            <span>🚚</span>
+            <h3>Fast Delivery</h3>
+            <p>Quick and convenient delivery.</p>
+        </div>
 
-        <div id="cartTotal" class="total"></div>
-    </section>
+        <div>
+            <span>🔒</span>
+            <h3>Secure Shopping</h3>
+            <p>Your shopping experience matters.</p>
+        </div>
 
-    <!-- CHECKOUT -->
-    <section id="checkout" class="hidden">
+        <div>
+            <span>💳</span>
+            <h3>Easy Payments</h3>
+            <p>Choose your preferred payment.</p>
+        </div>
+
+        <div>
+            <span>⭐</span>
+            <h3>Quality Products</h3>
+            <p>Products for every need.</p>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- PRODUCTS -->
+<section id="products" class="hidden">
+
+    <div class="section-title">
+        <p class="tag">OUR STORE</p>
+        <h1>Explore Products</h1>
+        <p>Find something you love.</p>
+    </div>
+
+    <div class="filters">
+
+        <input
+            id="search"
+            placeholder="🔎 Search products..."
+            oninput="displayProducts()">
+
+        <select id="category" onchange="displayProducts()">
+            <option value="All">All Categories</option>
+            <option>Mobiles</option>
+            <option>Laptops</option>
+            <option>Watches</option>
+            <option>Shoes</option>
+            <option>Accessories</option>
+        </select>
+
+    </div>
+
+    <div id="productList" class="product-grid"></div>
+
+</section>
+
+
+<!-- CART -->
+<section id="cart" class="hidden">
+
+    <div class="section-title">
+        <p class="tag">YOUR BAG</p>
+        <h1>Shopping Cart 🛒</h1>
+    </div>
+
+    <div id="cartList"></div>
+    <div id="cartTotal"></div>
+
+</section>
+
+
+<!-- CHECKOUT -->
+<section id="checkout" class="hidden">
+
+    <div class="section-title">
+        <p class="tag">FINAL STEP</p>
         <h1>Checkout</h1>
+    </div>
+
+    <div class="checkout-layout">
 
         <form id="checkoutForm">
 
-            <label>Name</label>
-            <input type="text" id="name" required>
+            <h2>Delivery Details</h2>
 
-            <label>Phone</label>
-            <input type="tel" id="phone" maxlength="10" required>
+            <label>Full Name</label>
+            <input id="name" required>
+
+            <label>Phone Number</label>
+            <input id="phone" maxlength="10" required>
 
             <label>Address</label>
             <textarea id="address" required></textarea>
 
             <label>City</label>
-            <input type="text" id="city" required>
+            <input id="city" required>
 
             <label>PIN Code</label>
-            <input type="text" id="pincode" maxlength="6" required>
+            <input id="pincode" maxlength="6" required>
 
-            <h3 id="checkoutTotal"></h3>
 
-            <button class="btn" type="submit">
-                Place Order - Cash on Delivery
+            <h2>Payment Method</h2>
+
+            <div class="payment-options">
+
+                <label class="payment">
+                    <input type="radio"
+                           name="payment"
+                           value="Cash on Delivery"
+                           checked>
+                    <span>💵</span>
+                    Cash on Delivery
+                </label>
+
+                <label class="payment">
+                    <input type="radio"
+                           name="payment"
+                           value="UPI">
+                    <span>📱</span>
+                    UPI
+                </label>
+
+                <label class="payment">
+                    <input type="radio"
+                           name="payment"
+                           value="Credit / Debit Card">
+                    <span>💳</span>
+                    Credit / Debit Card
+                </label>
+
+                <label class="payment">
+                    <input type="radio"
+                           name="payment"
+                           value="Net Banking">
+                    <span>🏦</span>
+                    Net Banking
+                </label>
+
+            </div>
+
+            <h2 id="checkoutTotal"></h2>
+
+            <button class="primary" type="submit">
+                Place Order ✓
             </button>
 
         </form>
-    </section>
 
-    <!-- ORDERS -->
-    <section id="orders" class="hidden">
-        <h1>My Orders</h1>
+    </div>
 
-        <div id="orderList"></div>
-    </section>
+</section>
+
+
+<!-- ORDERS -->
+<section id="orders" class="hidden">
+
+    <div class="section-title">
+        <p class="tag">YOUR ACCOUNT</p>
+        <h1>My Orders 📦</h1>
+    </div>
+
+    <div id="orderList"></div>
+
+</section>
+
+
+<!-- OWNER -->
+<section id="owner" class="hidden">
+
+    <div class="section-title">
+        <p class="tag">OWNER PANEL</p>
+        <h1>Product Management 👨‍💼</h1>
+    </div>
+
+    <div class="owner-layout">
+
+        <form id="productForm">
+
+            <h2>Add New Product</h2>
+
+            <label>Product Name</label>
+            <input id="productName" required>
+
+            <label>Category</label>
+            <select id="productCategory">
+                <option>Mobiles</option>
+                <option>Laptops</option>
+                <option>Watches</option>
+                <option>Shoes</option>
+                <option>Accessories</option>
+            </select>
+
+            <label>Price (₹)</label>
+            <input type="number" id="productPrice" required>
+
+            <label>Description</label>
+            <textarea id="productDescription" required></textarea>
+
+            <label>Product Graphic</label>
+            <select id="productIcon">
+                <option>📱</option>
+                <option>💻</option>
+                <option>⌚</option>
+                <option>👟</option>
+                <option>🎧</option>
+                <option>🎒</option>
+                <option>📷</option>
+                <option>🎮</option>
+            </select>
+
+            <button class="primary" type="submit">
+                + Add Product
+            </button>
+
+        </form>
+
+
+        <div class="owner-products">
+
+            <h2>Manage Products</h2>
+
+            <div id="ownerProductList"></div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- BILL -->
+<section id="bill" class="hidden">
+
+    <div id="billContent" class="bill">
+
+        <div class="bill-head">
+            <div>
+                <div class="logo">✦ ECW</div>
+                <p>Smart Shopping. Simple Living.</p>
+            </div>
+
+            <div>
+                <h2>INVOICE</h2>
+                <p id="billId"></p>
+            </div>
+        </div>
+
+        <hr>
+
+        <div id="billCustomer"></div>
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+
+            <tbody id="billItems"></tbody>
+
+        </table>
+
+        <div class="bill-total" id="billTotal"></div>
+
+        <div class="bill-footer">
+            <p>✓ Payment Confirmed</p>
+            <p>Thank you for shopping with ECW ❤️</p>
+        </div>
+
+    </div>
+
+    <button class="primary" onclick="window.print()">
+        🖨 Print Bill
+    </button>
+
+</section>
+
+
+<!-- LOGIN / SIGNUP -->
+<div id="authModal" class="modal hidden">
+
+    <div class="auth-box">
+
+        <button class="close" onclick="closeAuth()">×</button>
+
+        <div id="loginBox">
+
+            <div class="auth-icon">🔐</div>
+
+            <h1>Welcome Back</h1>
+            <p>Login to continue shopping.</p>
+
+            <input id="loginPhone"
+                   placeholder="📱 Phone Number"
+                   maxlength="10">
+
+            <input id="loginPassword"
+                   type="password"
+                   placeholder="🔑 Password">
+
+            <button class="primary" onclick="login()">
+                Login
+            </button>
+
+            <p class="switch">
+                New to ECW?
+                <button onclick="showAuth('signup')">
+                    Create Account
+                </button>
+            </p>
+
+        </div>
+
+
+        <div id="signupBox" class="hidden">
+
+            <div class="auth-icon">✨</div>
+
+            <h1>Create Account</h1>
+            <p>Join ECW today.</p>
+
+            <input id="signupName"
+                   placeholder="👤 Full Name">
+
+            <input id="signupPhone"
+                   placeholder="📱 Phone Number"
+                   maxlength="10">
+
+            <input id="signupPassword"
+                   type="password"
+                   placeholder="🔑 Create Password">
+
+            <button class="primary" onclick="signup()">
+                Create Account
+            </button>
+
+            <p class="switch">
+                Already have an account?
+                <button onclick="showAuth('login')">
+                    Login
+                </button>
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
 
 </main>
 
+
 <footer>
-    <p>© 2026 ECW. All Rights Reserved.</p>
+
+    <div class="logo">✦ ECW</div>
+
+    <p>
+        Your simple and smart e-commerce prototype.
+    </p>
+
+    <small>© 2026 ECW</small>
+
 </footer>
+
+
+<div id="toast"></div>
 
 <script src="script.js"></script>
 
