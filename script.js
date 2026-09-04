@@ -291,83 +291,75 @@ function displayProducts(list = products){
 }
 
 
-function productCard(p){
-
-    const wished =
-        wishlist.includes(p.id);
+function productCard(p) {
 
     return `
+    <div class="product-card">
 
-        <div class="product-card">
+        <!-- IMAGE + NAME ARE LINKED TO PRODUCT DETAILS -->
+        <div class="product-click"
+             onclick="viewProduct(${p.id})">
 
             <div class="product-image">
 
                 ${
                     p.image
                     ?
-                    `
-                    <img
-                        src="${p.image}"
-                        alt="${p.name}"
-                        onerror="
-                            this.style.display='none';
-                            this.nextElementSibling.style.display='flex';
-                        ">
-                    <div class="image-fallback">
-                        ${p.emoji || "🛍️"}
-                    </div>
-                    `
+                    `<img src="${p.image}"
+                          alt="${p.name}"
+                          onerror="this.style.display='none';
+                          this.nextElementSibling.style.display='flex';">`
                     :
-                    `
-                    <div class="image-fallback"
-                         style="display:flex">
-                        ${p.emoji || "🛍️"}
-                    </div>
-                    `
+                    ""
                 }
 
-            </div>
-
-            <div class="product-info">
-
-                <h3>${p.name}</h3>
-
-                <p>${p.category}</p>
-
-                <div class="price">
-                    ₹${Number(p.price).toLocaleString("en-IN")}
-                </div>
-
-                <p>${p.description || ""}</p>
-
-                <div class="product-actions">
-
-                    <button
-                        class="primary"
-                        onclick="addToCart(${p.id})">
-                        Add to Cart
-                    </button>
-
-                    <button
-                        class="secondary"
-                        onclick="viewProduct(${p.id})">
-                        View
-                    </button>
-
-                    <button
-                        class="secondary"
-                        onclick="toggleWishlist(${p.id})">
-                        ${wished ? "❤️" : "🤍"}
-                    </button>
-
+                <div class="image-fallback">
+                    ${p.emoji || "🛍️"}
                 </div>
 
             </div>
+
+            <h3 class="product-name">
+                ${p.name}
+            </h3>
 
         </div>
 
+        <p class="product-category">
+            ${p.category}
+        </p>
+
+        <div class="product-price">
+            ₹${Number(p.price).toLocaleString("en-IN")}
+        </div>
+
+        <p class="product-description">
+            ${p.description || "Quality product from ECW."}
+        </p>
+
+        <div class="product-actions">
+
+            <button class="primary"
+                    onclick="addToCart(${p.id})">
+                Add to Cart
+            </button>
+
+            <button class="secondary"
+                    onclick="viewProduct(${p.id})">
+                View
+            </button>
+
+        </div>
+
+        <button class="wishlist-btn"
+                onclick="toggleWishlist(${p.id})">
+            ❤️
+        </button>
+
+    </div>
     `;
 }
+
 
 
 /* ================================
@@ -407,35 +399,27 @@ function filterProducts(){
 /* ================================
    PRODUCT DETAILS
 ================================ */
+function viewProduct(id) {
 
-function viewProduct(id){
+    const product = products.find(p => p.id === id);
 
-    const product =
-        products.find(p => p.id === id);
+    if (!product) return;
 
-    if(!product) return;
-
-    const area =
-        document.getElementById("detailsArea");
-
-    area.innerHTML = `
+    document.getElementById("productDetails").innerHTML = `
 
         <div class="detail-card">
 
-            <div>
+            <div class="detail-image">
 
                 ${
                     product.image
                     ?
-                    `<img
-                        class="detail-image"
-                        src="${product.image}"
-                        onerror="this.style.display='none'">
-                    `
+                    `<img src="${product.image}"
+                          alt="${product.name}">`
                     :
-                    `<div class="product-image">
-                        ${product.emoji}
-                    </div>`
+                    `<div class="detail-fallback">
+                        ${product.emoji || "🛍️"}
+                     </div>`
                 }
 
             </div>
@@ -446,44 +430,37 @@ function viewProduct(id){
                     ${product.category}
                 </p>
 
-                <h2>${product.name}</h2>
+                <h1>
+                    ${product.name}
+                </h1>
 
-                <h2>
-                    ₹${Number(product.price)
-                        .toLocaleString("en-IN")}
+                <h2 class="detail-price">
+                    ₹${Number(product.price).toLocaleString("en-IN")}
                 </h2>
 
-                <p>${product.description}</p>
+                <p>
+                    ${product.description || "Quality product from ECW."}
+                </p>
 
                 <br>
 
-                <button
-                    class="primary"
-                    onclick="addToCart(${product.id})">
+                <button class="primary"
+                        onclick="addToCart(${product.id})">
                     🛒 Add to Cart
                 </button>
 
-                <button
-                    class="secondary"
-                    onclick="toggleWishlist(${product.id})">
-                    ❤️ Wishlist
-                </button>
-
-                <button
-                    class="secondary"
-                    onclick="showSection('products')">
-                    ← Back
+                <button class="secondary"
+                        onclick="showSection('products')">
+                    ← Back to Products
                 </button>
 
             </div>
 
         </div>
-
     `;
 
     showSection("productDetails");
 }
-
 
 /* ================================
    CART
@@ -1019,81 +996,46 @@ function displayOrders(){
 
                 <div class="order-card">
 
-                    <div class="order-head">
+    <div class="order-header">
 
-                        <div>
-                            <h3>
-                                Order ${order.id}
-                            </h3>
+        <div>
+            <h3>Order #${order.id}</h3>
+            <p>${order.date}</p>
+        </div>
 
-                            <p class="small">
-                                ${order.date}
-                            </p>
-                        </div>
+        <span class="order-status">
+            ${statusText(order.status)}
+        </span>
 
-                        <span class="status-badge">
-                            ${statusText(order.status)}
-                        </span>
+    </div>
 
-                    </div>
+    <div class="order-items">
+        ${order.items.map(item => `
+            <p>
+                ${item.name} × ${item.quantity}
+            </p>
+        `).join("")}
+    </div>
 
+    <h3>
+        Total:
+        ₹${Number(order.total).toLocaleString("en-IN")}
+    </h3>
 
-                    <div class="order-items">
+    <!-- NEW -->
+    <button class="primary track-btn"
+            onclick="trackOrder('${order.id}')">
+        📍 Track Order
+    </button>
 
-                        ${
-                            order.items.map(item => `
+    <button class="secondary"
+            onclick="generateBill(
+                orders.find(o => o.id === '${order.id}')
+            )">
+        🧾 View Invoice
+    </button>
 
-                                <div class="order-item">
-
-                                    <span>
-                                        ${item.emoji || "🛍️"}
-                                        ${item.name}
-                                        × ${item.qty}
-                                    </span>
-
-                                    <strong>
-                                        ₹${(
-                                            item.price *
-                                            item.qty
-                                        ).toLocaleString("en-IN")}
-                                    </strong>
-
-                                </div>
-
-                            `).join("")
-                        }
-
-                    </div>
-
-
-                    <h3>
-                        Total:
-                        ₹${order.total.toLocaleString("en-IN")}
-                    </h3>
-
-                    <p>
-                        Payment:
-                        ${paymentName(order.payment)}
-                    </p>
-
-                    <br>
-
-
-                    <button
-                        class="track-button"
-                        onclick="trackOrder('${order.id}')">
-                        📦 Track Order
-                    </button>
-
-                    <button
-                        class="secondary"
-                        onclick="generateBill(
-                            orders.find(o=>o.id==='${order.id}')
-                        )">
-                        🧾 View Invoice
-                    </button>
-
-                </div>
+</div>
 
             `;
 
@@ -2626,3 +2568,301 @@ document.addEventListener(
     "DOMContentLoaded",
     init
 );
+
+
+
+
+
+
+
+
+// ================= TRACK ORDER =================
+
+let currentTrackingOrderId = null;
+
+function trackOrder(orderId) {
+
+    const order = orders.find(o => o.id === orderId);
+
+    if (!order) {
+        toast("Order not found.");
+        return;
+    }
+
+    currentTrackingOrderId = orderId;
+
+    document.getElementById("trackingContent").innerHTML = `
+
+        <p class="small-title">
+            ORDER TRACKING
+        </p>
+
+        <h2>
+            📦 Track Your Order
+        </h2>
+
+        <div class="tracking-summary">
+
+            <p>
+                <strong>Order ID:</strong>
+                ${order.id}
+            </p>
+
+            <p>
+                <strong>Order Date:</strong>
+                ${order.date}
+            </p>
+
+            <p>
+                <strong>Total:</strong>
+                ₹${Number(order.total).toLocaleString("en-IN")}
+            </p>
+
+            <p>
+                <strong>Current Status:</strong>
+                <span class="tracking-status">
+                    ${statusText(order.status)}
+                </span>
+            </p>
+
+        </div>
+
+        <div class="tracking-timeline">
+
+            ${trackingStep(
+                "📝",
+                "Order Placed",
+                0,
+                order.status
+            )}
+
+            ${trackingStep(
+                "✅",
+                "Order Confirmed",
+                1,
+                order.status
+            )}
+
+            ${trackingStep(
+                "🚚",
+                "Shipped",
+                2,
+                order.status
+            )}
+
+            ${trackingStep(
+                "🛵",
+                "Out for Delivery",
+                3,
+                order.status
+            )}
+
+            ${trackingStep(
+                "🎉",
+                "Delivered",
+                4,
+                order.status
+            )}
+
+        </div>
+
+        <div class="tracking-delivery">
+
+            <h3>
+                📍 Delivery Details
+            </h3>
+
+            <p>
+                ${order.customer.name}
+            </p>
+
+            <p>
+                ${order.customer.address}
+            </p>
+
+            <p>
+                ${order.customer.city} -
+                ${order.customer.pincode}
+            </p>
+
+        </div>
+
+        <button class="secondary full"
+                onclick="closeTracking()">
+            Close
+        </button>
+    `;
+
+    document
+        .getElementById("trackingModal")
+        .classList.add("show");
+}
+
+
+// ================= TRACKING STEP =================
+
+function trackingStep(icon, title, step, currentStatus) {
+
+    let className = "";
+
+    if (step < currentStatus) {
+        className = "completed";
+    }
+
+    if (step === currentStatus) {
+        className = "active";
+    }
+
+    return `
+        <div class="tracking-step ${className}">
+
+            <div class="tracking-icon">
+                ${icon}
+            </div>
+
+            <div class="tracking-line"></div>
+
+            <div class="tracking-text">
+                <strong>${title}</strong>
+
+                <span>
+                    ${
+                        step < currentStatus
+                        ? "Completed"
+                        : step === currentStatus
+                        ? "Current Status"
+                        : "Pending"
+                    }
+                </span>
+            </div>
+
+        </div>
+    `;
+}
+
+
+// ================= CLOSE TRACKING =================
+
+function closeTracking() {
+
+    document
+        .getElementById("trackingModal")
+        .classList.remove("show");
+
+    currentTrackingOrderId = null;
+}
+
+
+
+
+function displayManageOrders() {
+
+    const box = document.getElementById("manageOrders");
+
+    if (!box) return;
+
+    if (!orders.length) {
+
+        box.innerHTML = `
+            <div class="empty">
+                No orders available.
+            </div>
+        `;
+
+        return;
+    }
+
+    box.innerHTML = orders.map(order => `
+
+        <div class="manage-order">
+
+            <div>
+
+                <strong>
+                    Order #${order.id}
+                </strong>
+
+                <p>
+                    ${order.customer.name}
+                </p>
+
+                <p class="small">
+                    Current:
+                    ${statusText(order.status)}
+                </p>
+
+            </div>
+
+            <div class="status-control">
+
+                <select id="status-${order.id}">
+
+                    <option value="0"
+                        ${order.status == 0 ? "selected" : ""}>
+                        Order Placed
+                    </option>
+
+                    <option value="1"
+                        ${order.status == 1 ? "selected" : ""}>
+                        Confirmed
+                    </option>
+
+                    <option value="2"
+                        ${order.status == 2 ? "selected" : ""}>
+                        Shipped
+                    </option>
+
+                    <option value="3"
+                        ${order.status == 3 ? "selected" : ""}>
+                        Out for Delivery
+                    </option>
+
+                    <option value="4"
+                        ${order.status == 4 ? "selected" : ""}>
+                        Delivered
+                    </option>
+
+                </select>
+
+                <button class="primary"
+                        onclick="updateOrderStatus('${order.id}')">
+
+                    Update
+
+                </button>
+
+            </div>
+
+        </div>
+
+    `).join("");
+}
+
+
+
+
+
+
+
+
+function updateOrderStatus(orderId) {
+
+    const order = orders.find(o => o.id === orderId);
+
+    if (!order) return;
+
+    const select =
+        document.getElementById("status-" + orderId);
+
+    order.status = Number(select.value);
+
+    localStorage.setItem(
+        "ecwOrders",
+        JSON.stringify(orders)
+    );
+
+    displayManageOrders();
+    displayOrders();
+
+    toast("Order status updated successfully.");
+}
