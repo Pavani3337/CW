@@ -10,443 +10,362 @@
 <body>
 
 <header>
-    <div class="logo">
-        <span>✦</span> ECW
-    </div>
+    <div class="logo" onclick="showSection('home')">✦ ECW</div>
 
     <nav>
         <button onclick="showSection('home')">Home</button>
         <button onclick="showSection('products')">Products</button>
-        <button onclick="showSection('cart')">
-            🛒 Cart <b id="cartCount">0</b>
-        </button>
+        <button onclick="showSection('cart')">🛒 Cart <span id="cartCount">0</span></button>
         <button onclick="showSection('orders')">Orders</button>
-        <button id="ownerBtn" onclick="showSection('owner')" class="owner-btn">
-            Owner
-        </button>
-        <button id="loginBtn" onclick="showAuth('login')">
-            Login
-        </button>
+        <button onclick="showSection('wishlist')">❤️ Wishlist</button>
+        <button onclick="showSection('profile')">👤 Profile</button>
+        <button onclick="showSection('owner')">Owner</button>
+        <button id="loginNav" onclick="openLogin()">Login</button>
+        <button id="logoutNav" onclick="logout()" class="hidden">Logout</button>
+        <button onclick="toggleTheme()">🌙</button>
     </nav>
 </header>
-
 
 <main>
 
 <!-- HOME -->
-<section id="home">
-
+<section id="home" class="section active">
     <div class="hero">
-
-        <div class="hero-text">
-            <p class="tag">✨ SIMPLE • SMART • SECURE</p>
-
-            <h1>
-                Shopping Made
-                <span>Beautiful.</span>
-            </h1>
-
-            <p>
-                Discover amazing products, enjoy smooth shopping
-                and experience ECW.
-            </p>
-
+        <div>
+            <p class="small-title">✨ SIMPLE • SMART • SECURE</p>
+            <h1>Shopping Made <span>Beautiful.</span></h1>
+            <p>Discover amazing products, enjoy smooth shopping and experience ECW.</p>
             <button class="primary" onclick="showSection('products')">
                 Explore Products →
             </button>
         </div>
 
         <div class="hero-art">
-            <div class="circle c1"></div>
-            <div class="circle c2"></div>
-            <div class="shopping-card">
-                🛍️
-                <strong>ECW</strong>
-                <small>Smart Shopping</small>
-            </div>
+            <div class="circle"></div>
+            <div class="shopping-box">🛍️</div>
         </div>
-
     </div>
 
     <div class="features">
-
-        <div>
-            <span>🚚</span>
-            <h3>Fast Delivery</h3>
-            <p>Quick and convenient delivery.</p>
-        </div>
-
-        <div>
-            <span>🔒</span>
-            <h3>Secure Shopping</h3>
-            <p>Your shopping experience matters.</p>
-        </div>
-
-        <div>
-            <span>💳</span>
-            <h3>Easy Payments</h3>
-            <p>Choose your preferred payment.</p>
-        </div>
-
-        <div>
-            <span>⭐</span>
-            <h3>Quality Products</h3>
-            <p>Products for every need.</p>
-        </div>
-
+        <div class="feature">🚚<h3>Fast Delivery</h3><p>Quick and convenient delivery.</p></div>
+        <div class="feature">🔒<h3>Secure Shopping</h3><p>Safe and simple shopping.</p></div>
+        <div class="feature">💳<h3>Easy Payments</h3><p>Choose your preferred payment.</p></div>
+        <div class="feature">⭐<h3>Quality Products</h3><p>Products for every need.</p></div>
     </div>
 
+    <div class="banner">
+        <div>
+            <p>ECW SPECIAL</p>
+            <h2>Everything You Need<br>In One Place.</h2>
+            <button class="primary" onclick="showSection('products')">Shop Now</button>
+        </div>
+        <div class="banner-icons">🎧 ⌚ 👟 💻 📱</div>
+    </div>
 </section>
 
 
 <!-- PRODUCTS -->
-<section id="products" class="hidden">
+<section id="products" class="section">
+    <div class="section-head">
+        <div>
+            <p class="small-title">OUR STORE</p>
+            <h2>Explore Products</h2>
+            <p>Find something you love.</p>
+        </div>
 
-    <div class="section-title">
-        <p class="tag">OUR STORE</p>
-        <h1>Explore Products</h1>
-        <p>Find something you love.</p>
+        <div class="tools">
+            <input id="searchBox" oninput="filterProducts()" placeholder="🔎 Search products...">
+            <select id="categoryFilter" onchange="filterProducts()">
+                <option value="All">All Categories</option>
+                <option>Electronics</option>
+                <option>Fashion</option>
+                <option>Sports</option>
+                <option>Home</option>
+                <option>Beauty</option>
+                <option>Books</option>
+            </select>
+        </div>
     </div>
 
-    <div class="filters">
+    <div id="productGrid" class="product-grid"></div>
+</section>
 
-        <input
-            id="search"
-            placeholder="🔎 Search products..."
-            oninput="displayProducts()">
 
-        <select id="category" onchange="displayProducts()">
-            <option value="All">All Categories</option>
-            <option>Mobiles</option>
-            <option>Laptops</option>
-            <option>Watches</option>
-            <option>Shoes</option>
-            <option>Accessories</option>
-        </select>
-
-    </div>
-
-    <div id="productList" class="product-grid"></div>
-
+<!-- PRODUCT DETAILS -->
+<section id="details" class="section">
+    <div id="productDetails"></div>
 </section>
 
 
 <!-- CART -->
-<section id="cart" class="hidden">
-
-    <div class="section-title">
-        <p class="tag">YOUR BAG</p>
-        <h1>Shopping Cart 🛒</h1>
-    </div>
-
-    <div id="cartList"></div>
-    <div id="cartTotal"></div>
-
+<section id="cart" class="section">
+    <p class="small-title">YOUR BAG</p>
+    <h2>Shopping Cart 🛒</h2>
+    <div id="cartArea"></div>
 </section>
 
 
 <!-- CHECKOUT -->
-<section id="checkout" class="hidden">
-
-    <div class="section-title">
-        <p class="tag">FINAL STEP</p>
-        <h1>Checkout</h1>
-    </div>
+<section id="checkout" class="section">
+    <p class="small-title">FINAL STEP</p>
+    <h2>Checkout</h2>
 
     <div class="checkout-layout">
 
-        <form id="checkoutForm">
-
-            <h2>Delivery Details</h2>
+        <div class="form-card">
+            <h3>Delivery Details</h3>
 
             <label>Full Name</label>
-            <input id="name" required>
+            <input id="deliveryName" placeholder="Enter your name">
 
             <label>Phone Number</label>
-            <input id="phone" maxlength="10" required>
+            <input id="deliveryPhone" maxlength="10" placeholder="10 digit phone number">
 
             <label>Address</label>
-            <textarea id="address" required></textarea>
+            <textarea id="deliveryAddress" placeholder="House / Street / Area"></textarea>
 
-            <label>City</label>
-            <input id="city" required>
-
-            <label>PIN Code</label>
-            <input id="pincode" maxlength="6" required>
-
-
-            <h2>Payment Method</h2>
-
-            <div class="payment-options">
-
-                <label class="payment">
-                    <input type="radio"
-                           name="payment"
-                           value="Cash on Delivery"
-                           checked>
-                    <span>💵</span>
-                    Cash on Delivery
-                </label>
-
-                <label class="payment">
-                    <input type="radio"
-                           name="payment"
-                           value="UPI">
-                    <span>📱</span>
-                    UPI
-                </label>
-
-                <label class="payment">
-                    <input type="radio"
-                           name="payment"
-                           value="Credit / Debit Card">
-                    <span>💳</span>
-                    Credit / Debit Card
-                </label>
-
-                <label class="payment">
-                    <input type="radio"
-                           name="payment"
-                           value="Net Banking">
-                    <span>🏦</span>
-                    Net Banking
-                </label>
-
+            <div class="two">
+                <div>
+                    <label>City</label>
+                    <input id="deliveryCity" placeholder="City">
+                </div>
+                <div>
+                    <label>PIN Code</label>
+                    <input id="deliveryPin" maxlength="6" placeholder="PIN">
+                </div>
             </div>
+        </div>
 
-            <h2 id="checkoutTotal"></h2>
+        <div class="form-card">
+            <h3>Payment Method</h3>
 
-            <button class="primary" type="submit">
-                Place Order ✓
-            </button>
+            <label class="payment-option">
+                <input type="radio" name="payment" value="COD" onchange="paymentChanged()">
+                <span>💵</span>
+                <div><b>Cash on Delivery</b><small>Pay when delivered</small></div>
+            </label>
 
-        </form>
+            <label class="payment-option">
+                <input type="radio" name="payment" value="UPI" onchange="paymentChanged()">
+                <span>📱</span>
+                <div><b>UPI</b><small>Google Pay / PhonePe / Paytm</small></div>
+            </label>
+
+            <label class="payment-option">
+                <input type="radio" name="payment" value="CARD" onchange="paymentChanged()">
+                <span>💳</span>
+                <div><b>Credit / Debit Card</b><small>Visa / Mastercard / RuPay</small></div>
+            </label>
+
+            <label class="payment-option">
+                <input type="radio" name="payment" value="NET" onchange="paymentChanged()">
+                <span>🏦</span>
+                <div><b>Net Banking</b><small>All major banks</small></div>
+            </label>
+
+            <div id="paymentBox"></div>
+
+            <button class="primary full" onclick="placeOrder()">Place Order ✓</button>
+        </div>
 
     </div>
-
 </section>
 
 
 <!-- ORDERS -->
-<section id="orders" class="hidden">
+<section id="orders" class="section">
+    <p class="small-title">MY SHOPPING</p>
+    <h2>My Orders 📦</h2>
+    <div id="ordersArea"></div>
+</section>
 
-    <div class="section-title">
-        <p class="tag">YOUR ACCOUNT</p>
-        <h1>My Orders 📦</h1>
+
+<!-- WISHLIST -->
+<section id="wishlist" class="section">
+    <p class="small-title">SAVED ITEMS</p>
+    <h2>My Wishlist ❤️</h2>
+    <div id="wishlistArea"></div>
+</section>
+
+
+<!-- PROFILE -->
+<section id="profile" class="section">
+    <p class="small-title">MY ACCOUNT</p>
+    <h2>Customer Profile 👤</h2>
+
+    <div class="profile-card">
+        <div class="profile-avatar">👤</div>
+        <div>
+            <h2 id="profileName">Guest</h2>
+            <p id="profilePhone">Please login to view your profile.</p>
+        </div>
     </div>
 
-    <div id="orderList"></div>
-
+    <div class="stats">
+        <div><b id="profileOrders">0</b><span>Orders</span></div>
+        <div><b id="profileWishlist">0</b><span>Wishlist</span></div>
+        <div><b id="profileSpent">₹0</b><span>Total Spent</span></div>
+    </div>
 </section>
 
 
 <!-- OWNER -->
-<section id="owner" class="hidden">
-
-    <div class="section-title">
-        <p class="tag">OWNER PANEL</p>
-        <h1>Product Management 👨‍💼</h1>
+<section id="owner" class="section">
+    <div id="ownerLoginBox">
+        <div class="login-card">
+            <div class="big-icon">👨‍💼</div>
+            <h2>Owner Panel</h2>
+            <p>Enter owner credentials to continue.</p>
+            <input id="ownerPhone" placeholder="Owner phone">
+            <input id="ownerPassword" type="password" placeholder="Password">
+            <button class="primary full" onclick="ownerLogin()">Login as Owner</button>
+        </div>
     </div>
 
-    <div class="owner-layout">
+    <div id="ownerDashboard" class="hidden">
 
-        <form id="productForm">
-
-            <h2>Add New Product</h2>
-
-            <label>Product Name</label>
-            <input id="productName" required>
-
-            <label>Category</label>
-            <select id="productCategory">
-                <option>Mobiles</option>
-                <option>Laptops</option>
-                <option>Watches</option>
-                <option>Shoes</option>
-                <option>Accessories</option>
-            </select>
-
-            <label>Price (₹)</label>
-            <input type="number" id="productPrice" required>
-
-            <label>Description</label>
-            <textarea id="productDescription" required></textarea>
-
-            <label>Product Graphic</label>
-            <select id="productIcon">
-                <option>📱</option>
-                <option>💻</option>
-                <option>⌚</option>
-                <option>👟</option>
-                <option>🎧</option>
-                <option>🎒</option>
-                <option>📷</option>
-                <option>🎮</option>
-            </select>
-
-            <button class="primary" type="submit">
-                + Add Product
-            </button>
-
-        </form>
-
-
-        <div class="owner-products">
-
-            <h2>Manage Products</h2>
-
-            <div id="ownerProductList"></div>
-
+        <div class="section-head">
+            <div>
+                <p class="small-title">OWNER PANEL</p>
+                <h2>Dashboard 📊</h2>
+            </div>
+            <button onclick="ownerLogout()" class="danger">Owner Logout</button>
         </div>
 
-    </div>
+        <div class="dashboard-stats">
+            <div><span>📦</span><b id="statProducts">0</b><small>Products</small></div>
+            <div><span>🛒</span><b id="statOrders">0</b><small>Orders</small></div>
+            <div><span>👥</span><b id="statCustomers">0</b><small>Customers</small></div>
+            <div><span>💰</span><b id="statSales">₹0</b><small>Total Sales</small></div>
+        </div>
 
+        <div class="owner-grid">
+
+            <div class="form-card">
+                <h3 id="productFormTitle">Add New Product</h3>
+
+                <input type="hidden" id="editProductId">
+
+                <label>Product Name</label>
+                <input id="productName" placeholder="Product name">
+
+                <label>Category</label>
+                <select id="productCategory">
+                    <option>Electronics</option>
+                    <option>Fashion</option>
+                    <option>Sports</option>
+                    <option>Home</option>
+                    <option>Beauty</option>
+                    <option>Books</option>
+                </select>
+
+                <label>Price (₹)</label>
+                <input id="productPrice" type="number" placeholder="Price">
+
+                <label>Description</label>
+                <textarea id="productDescription" placeholder="Product description"></textarea>
+
+                <label>Product Image</label>
+                <input id="productImage" type="file" accept="image/*" onchange="previewImage(event)">
+
+                <div id="imagePreview"></div>
+
+                <label>Product Graphic</label>
+                <select id="productEmoji">
+                    <option>📱</option>
+                    <option>🎧</option>
+                    <option>⌚</option>
+                    <option>👟</option>
+                    <option>💻</option>
+                    <option>👕</option>
+                    <option>🏠</option>
+                    <option>💄</option>
+                    <option>📚</option>
+                    <option>🎮</option>
+                </select>
+
+                <button class="primary full" onclick="saveProduct()">+ Save Product</button>
+                <button id="cancelEdit" class="secondary full hidden" onclick="resetProductForm()">Cancel Edit</button>
+            </div>
+
+            <div class="form-card">
+                <h3>Manage Products</h3>
+                <div id="manageProducts"></div>
+            </div>
+
+        </div>
+    </div>
 </section>
 
 
 <!-- BILL -->
-<section id="bill" class="hidden">
-
-    <div id="billContent" class="bill">
-
-        <div class="bill-head">
-            <div>
-                <div class="logo">✦ ECW</div>
-                <p>Smart Shopping. Simple Living.</p>
-            </div>
-
-            <div>
-                <h2>INVOICE</h2>
-                <p id="billId"></p>
-            </div>
-        </div>
-
-        <hr>
-
-        <div id="billCustomer"></div>
-
-        <table>
-
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Qty</th>
-                    <th>Price</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-
-            <tbody id="billItems"></tbody>
-
-        </table>
-
-        <div class="bill-total" id="billTotal"></div>
-
-        <div class="bill-footer">
-            <p>✓ Payment Confirmed</p>
-            <p>Thank you for shopping with ECW ❤️</p>
-        </div>
-
-    </div>
-
-    <button class="primary" onclick="window.print()">
-        🖨 Print Bill
-    </button>
-
+<section id="bill" class="section">
+    <div id="billContent"></div>
 </section>
-
-
-<!-- LOGIN / SIGNUP -->
-<div id="authModal" class="modal hidden">
-
-    <div class="auth-box">
-
-        <button class="close" onclick="closeAuth()">×</button>
-
-        <div id="loginBox">
-
-            <div class="auth-icon">🔐</div>
-
-            <h1>Welcome Back</h1>
-            <p>Login to continue shopping.</p>
-
-            <input id="loginPhone"
-                   placeholder="📱 Phone Number"
-                   maxlength="10">
-
-            <input id="loginPassword"
-                   type="password"
-                   placeholder="🔑 Password">
-
-            <button class="primary" onclick="login()">
-                Login
-            </button>
-
-            <p class="switch">
-                New to ECW?
-                <button onclick="showAuth('signup')">
-                    Create Account
-                </button>
-            </p>
-
-        </div>
-
-
-        <div id="signupBox" class="hidden">
-
-            <div class="auth-icon">✨</div>
-
-            <h1>Create Account</h1>
-            <p>Join ECW today.</p>
-
-            <input id="signupName"
-                   placeholder="👤 Full Name">
-
-            <input id="signupPhone"
-                   placeholder="📱 Phone Number"
-                   maxlength="10">
-
-            <input id="signupPassword"
-                   type="password"
-                   placeholder="🔑 Create Password">
-
-            <button class="primary" onclick="signup()">
-                Create Account
-            </button>
-
-            <p class="switch">
-                Already have an account?
-                <button onclick="showAuth('login')">
-                    Login
-                </button>
-            </p>
-
-        </div>
-
-    </div>
-
-</div>
-
 
 </main>
 
 
-<footer>
+<!-- LOGIN MODAL -->
+<div id="authModal" class="modal">
+    <div class="modal-card">
+        <button class="close" onclick="closeAuth()">×</button>
 
-    <div class="logo">✦ ECW</div>
+        <div id="loginForm">
+            <div class="big-icon">🔐</div>
+            <h2>Welcome Back</h2>
+            <p>Login to continue shopping.</p>
 
-    <p>
-        Your simple and smart e-commerce prototype.
-    </p>
+            <input id="loginPhone" maxlength="10" placeholder="📱 Phone Number">
+            <input id="loginPassword" type="password" placeholder="🔑 Password">
 
-    <small>© 2026 ECW</small>
+            <button class="primary full" onclick="login()">Login</button>
 
-</footer>
+            <p class="switch">
+                New to ECW?
+                <button onclick="showSignup()">Create Account</button>
+            </p>
+        </div>
+
+        <div id="signupForm" class="hidden">
+            <div class="big-icon">✨</div>
+            <h2>Create Account</h2>
+            <p>Join ECW today.</p>
+
+            <input id="signupName" placeholder="👤 Full Name">
+            <input id="signupPhone" maxlength="10" placeholder="📱 Phone Number">
+            <input id="signupPassword" type="password" placeholder="🔑 Create Password">
+
+            <button class="primary full" onclick="signup()">Create Account</button>
+
+            <p class="switch">
+                Already have an account?
+                <button onclick="showLogin()">Login</button>
+            </p>
+        </div>
+
+        <!-- OTP -->
+        <div id="otpForm" class="hidden">
+            <div class="big-icon">📱</div>
+            <h2>Verify Phone</h2>
+            <p>Prototype OTP sent to your phone.</p>
+            <div class="otp-demo">1234</div>
+            <input id="otpInput" maxlength="4" placeholder="Enter OTP">
+            <button class="primary full" onclick="verifyOTP()">Verify OTP</button>
+        </div>
+    </div>
+</div>
 
 
+<!-- TOAST -->
 <div id="toast"></div>
 
-<script src="script.js"></script>
+<footer>
+    <div class="logo">✦ ECW</div>
+    <p>Smart Shopping. Simple Living.</p>
+    <p>© 2026 ECW • Everything You Need</p>
+</footer>
 
+<script src="script.js"></script>
 </body>
 </html>
