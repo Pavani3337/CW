@@ -1558,7 +1558,7 @@ function ownerLogin(){
 
 
     if(
-        phone === "9999999999" &&
+        phone === "9121653359" &&
         password === "owner123"
     ){
 
