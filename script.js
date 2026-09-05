@@ -1,48 +1,91 @@
-/* =========================
+/* ================================
    ECW - EVERYTHING YOU NEED
-   LocalStorage Prototype
-========================= */
+   LocalStorage E-Commerce Prototype
+================================ */
 
-const OWNER_PHONE = "9999999999";
-const OWNER_PASSWORD = "owner123";
 
-let products = JSON.parse(localStorage.getItem("ecwProducts")) || [
+const STORAGE = {
+    products:"ecwProducts",
+    cart:"ecwCart",
+    orders:"ecwOrders",
+    users:"ecwUsers",
+    wishlist:"ecwWishlist",
+    user:"ecwCurrentUser",
+    theme:"ecwTheme"
+};
+
+
+/* ================================
+   PRODUCT IMAGES
+================================ */
+
+const productImages = {
+
+    1:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80",
+
+    2:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80",
+
+    3:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80",
+
+    4:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80",
+
+    5:"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80",
+
+    6:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=800&q=80",
+
+    7:"https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=800&q=80",
+
+    8:"https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80"
+
+};
+
+
+/* ================================
+   DEFAULT PRODUCTS
+================================ */
+
+const defaultProducts = [
+
     {
         id:1,
         name:"Wireless Headphones",
         category:"Electronics",
         price:1499,
-        description:"Premium wireless headphones with clear sound.",
+        description:"High-quality wireless headphones.",
         emoji:"🎧",
-        image:""
+        image:productImages[1]
     },
+
     {
         id:2,
         name:"Smart Watch",
         category:"Electronics",
         price:2499,
-        description:"Smart watch with fitness and notification features.",
+        description:"Smart watch with useful features.",
         emoji:"⌚",
-        image:""
+        image:productImages[2]
     },
+
     {
         id:3,
         name:"Running Shoes",
         category:"Sports",
         price:1999,
-        description:"Comfortable shoes for running and daily fitness.",
+        description:"Comfortable shoes for running.",
         emoji:"👟",
-        image:""
+        image:productImages[3]
     },
+
     {
         id:4,
         name:"Laptop Backpack",
         category:"Fashion",
         price:1299,
-        description:"Stylish and durable backpack for laptops.",
+        description:"Stylish and durable backpack.",
         emoji:"🎒",
-        image:""
+        image:productImages[4]
     },
+
     {
         id:5,
         name:"Smart Phone",
@@ -50,8 +93,9 @@ let products = JSON.parse(localStorage.getItem("ecwProducts")) || [
         price:15999,
         description:"Modern smartphone for everyday use.",
         emoji:"📱",
-        image:""
+        image:productImages[5]
     },
+
     {
         id:6,
         name:"Cotton T-Shirt",
@@ -59,248 +103,412 @@ let products = JSON.parse(localStorage.getItem("ecwProducts")) || [
         price:699,
         description:"Soft and comfortable cotton T-shirt.",
         emoji:"👕",
-        image:""
+        image:productImages[6]
     },
+
     {
         id:7,
         name:"Table Lamp",
         category:"Home",
         price:899,
-        description:"Elegant LED table lamp for your room.",
+        description:"Beautiful lamp for your room.",
         emoji:"💡",
-        image:""
+        image:productImages[7]
     },
+
     {
         id:8,
         name:"Beauty Kit",
         category:"Beauty",
         price:999,
-        description:"Complete everyday beauty care kit.",
+        description:"Complete beauty care kit.",
         emoji:"💄",
-        image:""
+        image:productImages[8]
     }
+
 ];
 
-let cart = JSON.parse(localStorage.getItem("ecwCart")) || [];
-let orders = JSON.parse(localStorage.getItem("ecwOrders")) || [];
-let users = JSON.parse(localStorage.getItem("ecwUsers")) || [];
-let wishlist = JSON.parse(localStorage.getItem("ecwWishlist")) || [];
-let currentUser = JSON.parse(localStorage.getItem("ecwCurrentUser")) || null;
+
+/* ================================
+   DATA
+================================ */
+
+let products =
+    JSON.parse(localStorage.getItem(STORAGE.products)) || [];
+
+let cart =
+    JSON.parse(localStorage.getItem(STORAGE.cart)) || [];
+
+let orders =
+    JSON.parse(localStorage.getItem(STORAGE.orders)) || [];
+
+let users =
+    JSON.parse(localStorage.getItem(STORAGE.users)) || [];
+
+let wishlist =
+    JSON.parse(localStorage.getItem(STORAGE.wishlist)) || [];
+
+let currentUser =
+    JSON.parse(localStorage.getItem(STORAGE.user)) || null;
+
 let selectedImage = "";
-let pendingSignup = null;
-let ownerActive = false;
+
+let currentTrackingOrderId = null;
 
 
-/* =========================
-   STORAGE
-========================= */
+/* ================================
+   FIX OLD PRODUCT DATA
+================================ */
 
-function saveData(){
-    localStorage.setItem("ecwProducts",JSON.stringify(products));
-    localStorage.setItem("ecwCart",JSON.stringify(cart));
-    localStorage.setItem("ecwOrders",JSON.stringify(orders));
-    localStorage.setItem("ecwUsers",JSON.stringify(users));
-    localStorage.setItem("ecwWishlist",JSON.stringify(wishlist));
+function fixProductImages(){
 
-    if(currentUser)
-        localStorage.setItem("ecwCurrentUser",JSON.stringify(currentUser));
-    else
-        localStorage.removeItem("ecwCurrentUser");
+    if(!products.length){
+
+        products = [...defaultProducts];
+
+    }else{
+
+        products = products.map(product => {
+
+            if(!product.image){
+
+                product.image =
+                    productImages[product.id] || "";
+
+            }
+
+            return product;
+
+        });
+
+    }
+
+    saveData();
 }
 
 
-/* =========================
-   SECTION NAVIGATION
-========================= */
+/* ================================
+   SAVE DATA
+================================ */
+
+function saveData(){
+
+    localStorage.setItem(
+        STORAGE.products,
+        JSON.stringify(products)
+    );
+
+    localStorage.setItem(
+        STORAGE.cart,
+        JSON.stringify(cart)
+    );
+
+    localStorage.setItem(
+        STORAGE.orders,
+        JSON.stringify(orders)
+    );
+
+    localStorage.setItem(
+        STORAGE.users,
+        JSON.stringify(users)
+    );
+
+    localStorage.setItem(
+        STORAGE.wishlist,
+        JSON.stringify(wishlist)
+    );
+
+}
+
+
+/* ================================
+   NAVIGATION
+================================ */
 
 function showSection(id){
 
-    document.querySelectorAll(".section").forEach(s=>{
-        s.classList.remove("active");
-    });
+    document.querySelectorAll(".section")
+        .forEach(section =>
+            section.classList.remove("active")
+        );
 
-    const section=document.getElementById(id);
+    const section =
+        document.getElementById(id);
 
-    if(section){
+    if(section)
         section.classList.add("active");
-    }
 
-    if(id==="products") displayProducts();
-    if(id==="cart") displayCart();
-    if(id==="checkout") displayCheckout();
-    if(id==="orders") displayOrders();
-    if(id==="wishlist") displayWishlist();
-    if(id==="profile") displayProfile();
-    if(id==="owner") updateOwner();
+
+    if(id === "products")
+        displayProducts();
+
+    if(id === "cart")
+        displayCart();
+
+    if(id === "checkout")
+        displayCheckout();
+
+    if(id === "orders")
+        displayOrders();
+
+    if(id === "wishlist")
+        displayWishlist();
+
+    if(id === "profile")
+        displayProfile();
+
+    if(id === "owner")
+        checkOwner();
+
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
 }
 
 
-/* =========================
-   PRODUCTS
-========================= */
+/* ================================
+   PRODUCT DISPLAY
+================================ */
 
-function displayProducts(){
+function displayProducts(list = products){
 
-    const grid=document.getElementById("productGrid");
+    const area =
+        document.getElementById("productsArea");
 
-    if(!grid)return;
+    if(!area) return;
 
-    const search=(document.getElementById("searchBox")?.value || "").toLowerCase();
+    if(!list.length){
 
-    const category=document.getElementById("categoryFilter")?.value || "All";
+        area.innerHTML =
+            "<p>No products found.</p>";
 
-    const filtered=products.filter(p=>{
-
-        const matchesSearch=
-            p.name.toLowerCase().includes(search) ||
-            p.description.toLowerCase().includes(search);
-
-        const matchesCategory=
-            category==="All" || p.category===category;
-
-        return matchesSearch && matchesCategory;
-    });
-
-    if(filtered.length===0){
-        grid.innerHTML=`
-            <div class="empty" style="grid-column:1/-1">
-                <div>🔎</div>
-                <h3>No products found</h3>
-                <p>Try another search or category.</p>
-            </div>`;
         return;
     }
 
-    grid.innerHTML=filtered.map(productCard).join("");
+    area.innerHTML =
+        list.map(productCard).join("");
 }
 
 
 function productCard(p){
 
-    const liked=wishlist.includes(p.id);
-
-    const image=p.image
-        ? `<img src="${p.image}" alt="${p.name}">`
-        : `<span>${p.emoji}</span>`;
+    const wished =
+        wishlist.includes(p.id);
 
     return `
-        <div class="product">
 
-            <button class="wish" onclick="toggleWishlist(${p.id})">
-                ${liked?"❤️":"🤍"}
-            </button>
+        <div class="product-card">
 
             <div class="product-image">
-                ${image}
+
+                ${
+                    p.image
+                    ?
+                    `
+                    <img
+                        src="${p.image}"
+                        alt="${p.name}"
+                        onerror="
+                            this.style.display='none';
+                            this.nextElementSibling.style.display='flex';
+                        ">
+                    <div class="image-fallback">
+                        ${p.emoji || "🛍️"}
+                    </div>
+                    `
+                    :
+                    `
+                    <div class="image-fallback"
+                         style="display:flex">
+                        ${p.emoji || "🛍️"}
+                    </div>
+                    `
+                }
+
             </div>
 
             <div class="product-info">
 
-                <span class="category">${p.category}</span>
-
                 <h3>${p.name}</h3>
 
-                <p class="description">${p.description}</p>
-
-                <div class="price">₹${Number(p.price).toLocaleString("en-IN")}</div>
-
-                <div class="product-actions">
-
-                    <button onclick="viewProduct(${p.id})">
-                        View
-                    </button>
-
-                    <button class="add" onclick="addToCart(${p.id})">
-                        Add to Cart
-                    </button>
-
-                </div>
-
-            </div>
-        </div>
-    `;
-}
-
-
-function filterProducts(){
-    displayProducts();
-}
-
-
-/* =========================
-   PRODUCT DETAILS
-========================= */
-
-function viewProduct(id){
-
-    const p=products.find(x=>x.id===id);
-
-    if(!p)return;
-
-    const image=p.image
-        ? `<img src="${p.image}" alt="${p.name}">`
-        : `<span>${p.emoji}</span>`;
-
-    document.getElementById("productDetails").innerHTML=`
-
-        <button class="secondary" onclick="showSection('products')">
-            ← Back to Products
-        </button>
-
-        <div class="detail-card">
-
-            <div class="detail-image">
-                ${image}
-            </div>
-
-            <div class="detail-info">
-
-                <span class="category">${p.category}</span>
-
-                <h1>${p.name}</h1>
-
-                <p>${p.description}</p>
+                <p>${p.category}</p>
 
                 <div class="price">
                     ₹${Number(p.price).toLocaleString("en-IN")}
                 </div>
 
-                <button class="primary"
-                    onclick="addToCart(${p.id});showSection('cart')">
+                <p>${p.description || ""}</p>
+
+                <div class="product-actions">
+
+                    <button
+                        class="primary"
+                        onclick="addToCart(${p.id})">
+                        Add to Cart
+                    </button>
+
+                    <button
+                        class="secondary"
+                        onclick="viewProduct(${p.id})">
+                        View
+                    </button>
+
+                    <button
+                        class="secondary"
+                        onclick="toggleWishlist(${p.id})">
+                        ${wished ? "❤️" : "🤍"}
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+}
+
+
+/* ================================
+   SEARCH
+================================ */
+
+function filterProducts(){
+
+    const search =
+        document.getElementById("search")
+            .value.toLowerCase();
+
+    const category =
+        document.getElementById("category")
+            .value;
+
+    const filtered =
+        products.filter(product => {
+
+            const matchSearch =
+                product.name.toLowerCase()
+                    .includes(search);
+
+            const matchCategory =
+                category === "All" ||
+                product.category === category;
+
+            return matchSearch &&
+                   matchCategory;
+
+        });
+
+    displayProducts(filtered);
+}
+
+
+/* ================================
+   PRODUCT DETAILS
+================================ */
+
+function viewProduct(id){
+
+    const product =
+        products.find(p => p.id === id);
+
+    if(!product) return;
+
+    const area =
+        document.getElementById("detailsArea");
+
+    area.innerHTML = `
+
+        <div class="detail-card">
+
+            <div>
+
+                ${
+                    product.image
+                    ?
+                    `<img
+                        class="detail-image"
+                        src="${product.image}"
+                        onerror="this.style.display='none'">
+                    `
+                    :
+                    `<div class="product-image">
+                        ${product.emoji}
+                    </div>`
+                }
+
+            </div>
+
+            <div class="detail-info">
+
+                <p class="small-title">
+                    ${product.category}
+                </p>
+
+                <h2>${product.name}</h2>
+
+                <h2>
+                    ₹${Number(product.price)
+                        .toLocaleString("en-IN")}
+                </h2>
+
+                <p>${product.description}</p>
+
+                <br>
+
+                <button
+                    class="primary"
+                    onclick="addToCart(${product.id})">
                     🛒 Add to Cart
                 </button>
 
-                <button class="secondary"
-                    onclick="toggleWishlist(${p.id})">
-                    ❤️ Add to Wishlist
+                <button
+                    class="secondary"
+                    onclick="toggleWishlist(${product.id})">
+                    ❤️ Wishlist
+                </button>
+
+                <button
+                    class="secondary"
+                    onclick="showSection('products')">
+                    ← Back
                 </button>
 
             </div>
 
         </div>
+
     `;
 
-    showSection("details");
+    showSection("productDetails");
 }
 
 
-/* =========================
+/* ================================
    CART
-========================= */
+================================ */
 
 function addToCart(id){
 
-    const item=cart.find(x=>x.id===id);
+    const item =
+        cart.find(item => item.id === id);
 
     if(item){
+
         item.qty++;
+
     }else{
-        cart.push({id:id,qty:1});
+
+        cart.push({
+            id:id,
+            qty:1
+        });
+
     }
 
     saveData();
     updateCartCount();
-    displayCart();
 
     toast("Product added to cart 🛒");
 }
@@ -308,107 +516,144 @@ function addToCart(id){
 
 function updateCartCount(){
 
-    const count=cart.reduce((sum,item)=>sum+item.qty,0);
+    const count =
+        cart.reduce(
+            (sum,item) => sum + item.qty,
+            0
+        );
 
-    document.getElementById("cartCount").textContent=count;
+    document.getElementById("cartCount")
+        .textContent = count;
 }
 
 
 function displayCart(){
 
-    const area=document.getElementById("cartArea");
+    const area =
+        document.getElementById("cartArea");
 
-    if(!area)return;
+    if(!cart.length){
 
-    if(cart.length===0){
-
-        area.innerHTML=`
-            <div class="empty">
-                <div>🛒</div>
-                <h3>Your cart is empty</h3>
-                <p>Add products to continue shopping.</p>
-                <button class="primary"
+        area.innerHTML = `
+            <div class="form-card">
+                <h3>Your cart is empty 🛒</h3>
+                <button
+                    class="primary"
                     onclick="showSection('products')">
-                    Explore Products
+                    Start Shopping
                 </button>
-            </div>`;
+            </div>
+        `;
 
         return;
     }
 
-    let total=0;
+    let total = 0;
 
-    const items=cart.map(item=>{
+    area.innerHTML =
+        cart.map(item => {
 
-        const p=products.find(x=>x.id===item.id);
+            const product =
+                products.find(p => p.id === item.id);
 
-        if(!p)return "";
+            if(!product) return "";
 
-        total+=p.price*item.qty;
+            const itemTotal =
+                product.price * item.qty;
 
-        const image=p.image
-            ? `<img src="${p.image}">`
-            : p.emoji;
+            total += itemTotal;
 
-        return `
-            <div class="cart-item">
+            return `
 
-                <div class="cart-img">${image}</div>
+                <div class="cart-item">
 
-                <div class="cart-details">
-                    <h3>${p.name}</h3>
-                    <p class="category">${p.category}</p>
-                    <b>₹${Number(p.price).toLocaleString("en-IN")}</b>
+                    ${
+                        product.image
+                        ?
+                        `<img src="${product.image}"
+                              alt="${product.name}">`
+                        :
+                        `<div style="font-size:45px">
+                            ${product.emoji}
+                        </div>`
+                    }
+
+                    <div>
+
+                        <h3>${product.name}</h3>
+
+                        <p>₹${product.price}</p>
+
+                    </div>
+
+                    <div class="qty">
+
+                        <button
+                            onclick="changeQty(${product.id},-1)">
+                            −
+                        </button>
+
+                        <strong>${item.qty}</strong>
+
+                        <button
+                            onclick="changeQty(${product.id},1)">
+                            +
+                        </button>
+
+                    </div>
+
+                    <strong>
+                        ₹${itemTotal.toLocaleString("en-IN")}
+                    </strong>
+
+                    <button
+                        class="danger primary"
+                        onclick="removeFromCart(${product.id})">
+                        Remove
+                    </button>
+
                 </div>
 
-                <div class="qty">
-                    <button onclick="changeQty(${p.id},-1)">−</button>
-                    <b>${item.qty}</b>
-                    <button onclick="changeQty(${p.id},1)">+</button>
-                </div>
+            `;
 
-                <b>₹${Number(p.price*item.qty).toLocaleString("en-IN")}</b>
+        }).join("");
 
-                <button class="remove"
-                    onclick="removeFromCart(${p.id})">
-                    Remove
-                </button>
 
-            </div>
-        `;
-    }).join("");
+    area.innerHTML += `
 
-    area.innerHTML=`
+        <div class="form-card">
 
-        ${items}
+            <h2>
+                Total:
+                ₹${total.toLocaleString("en-IN")}
+            </h2>
 
-        <div class="cart-summary">
-
-            <div class="total">
-                <span>Total</span>
-                <span>₹${Number(total).toLocaleString("en-IN")}</span>
-            </div>
-
-            <button class="primary full"
+            <button
+                class="primary"
                 onclick="startCheckout()">
                 Proceed to Checkout →
             </button>
 
         </div>
+
     `;
 }
 
 
 function changeQty(id,value){
 
-    const item=cart.find(x=>x.id===id);
+    const item =
+        cart.find(item => item.id === id);
 
-    if(!item)return;
+    if(!item) return;
 
-    item.qty+=value;
+    item.qty += value;
 
-    if(item.qty<=0){
-        cart=cart.filter(x=>x.id!==id);
+    if(item.qty <= 0){
+
+        cart =
+            cart.filter(item => item.id !== id);
+
     }
 
     saveData();
@@ -419,21 +664,27 @@ function changeQty(id,value){
 
 function removeFromCart(id){
 
-    cart=cart.filter(x=>x.id!==id);
+    cart =
+        cart.filter(item => item.id !== id);
 
     saveData();
     updateCartCount();
     displayCart();
 
-    toast("Item removed");
+    toast("Product removed.");
 }
 
 
+/* ================================
+   CHECKOUT
+================================ */
+
 function startCheckout(){
 
-    if(!currentUser){
-        toast("Please login first 🔐");
-        openLogin();
+    if(!cart.length){
+
+        toast("Your cart is empty.");
+
         return;
     }
 
@@ -444,1058 +695,1934 @@ function startCheckout(){
 
 function displayCheckout(){
 
-    if(cart.length===0){
-        showSection("cart");
-        toast("Your cart is empty");
+    let total = 0;
+
+    cart.forEach(item => {
+
+        const product =
+            products.find(p => p.id === item.id);
+
+        if(product)
+            total += product.price * item.qty;
+
+    });
+
+    document.getElementById("checkoutTotal")
+        .textContent =
+        "Total: ₹" +
+        total.toLocaleString("en-IN");
+
+    if(currentUser){
+
+        document.getElementById("checkoutName")
+            .value = currentUser.name || "";
+
+        document.getElementById("checkoutPhone")
+            .value = currentUser.phone || "";
+
     }
+
 }
 
-
-/* =========================
-   PAYMENT
-========================= */
 
 function paymentChanged(){
 
-    const selected=document.querySelector(
-        'input[name="payment"]:checked'
-    );
+    const method =
+        document.querySelector(
+            'input[name="payment"]:checked'
+        ).value;
 
-    const box=document.getElementById("paymentBox");
+    const area =
+        document.getElementById("paymentInfo");
 
-    if(!selected){
-        box.innerHTML="";
-        return;
-    }
+    if(method === "UPI"){
 
-    if(selected.value==="COD"){
-
-        box.innerHTML=`
-            <div class="payment-info">
-                💵 <b>Cash on Delivery</b>
-                <p>Pay when your order arrives.</p>
+        area.innerHTML = `
+            <div class="form-card">
+                <strong>UPI Payment</strong>
+                <input placeholder="Enter UPI ID"
+                       id="upiId">
             </div>
         `;
+
     }
 
-    if(selected.value==="UPI"){
+    else if(method === "CARD"){
 
-        box.innerHTML=`
-            <input id="upiId"
-                placeholder="Enter UPI ID e.g. pavani@upi">
+        area.innerHTML = `
+            <div class="form-card">
+                <strong>Card Details</strong>
 
-            <p class="description">
-                Prototype payment interface.
+                <input placeholder="Card Number">
+
+                <input placeholder="Card Holder Name">
+
+                <div style="display:flex;gap:8px">
+                    <input placeholder="MM/YY">
+                    <input placeholder="CVV">
+                </div>
+            </div>
+        `;
+
+    }
+
+    else if(method === "NETBANKING"){
+
+        area.innerHTML = `
+            <div class="form-card">
+                <strong>Net Banking</strong>
+
+                <select>
+                    <option>Select Bank</option>
+                    <option>SBI</option>
+                    <option>HDFC Bank</option>
+                    <option>ICICI Bank</option>
+                    <option>Axis Bank</option>
+                    <option>Bank of Baroda</option>
+                </select>
+            </div>
+        `;
+
+    }
+
+    else{
+
+        area.innerHTML = `
+            <p class="small">
+                Pay when your order is delivered.
             </p>
         `;
+
     }
 
-    if(selected.value==="CARD"){
-
-        box.innerHTML=`
-            <input id="cardNumber"
-                maxlength="19"
-                placeholder="Card Number">
-
-            <div class="two">
-                <input id="cardExpiry"
-                    placeholder="MM/YY">
-
-                <input id="cardCVV"
-                    maxlength="3"
-                    type="password"
-                    placeholder="CVV">
-            </div>
-
-            <input id="cardName"
-                placeholder="Name on Card">
-        `;
-    }
-
-    if(selected.value==="NET"){
-
-        box.innerHTML=`
-            <select id="bank">
-                <option value="">Select Bank</option>
-                <option>State Bank of India</option>
-                <option>HDFC Bank</option>
-                <option>ICICI Bank</option>
-                <option>Axis Bank</option>
-                <option>Canara Bank</option>
-                <option>Bank of Baroda</option>
-            </select>
-        `;
-    }
 }
 
 
-/* =========================
-   ORDER
-========================= */
+/* ================================
+   PLACE ORDER
+================================ */
 
 function placeOrder(){
 
-    if(!currentUser){
-        toast("Please login first");
-        openLogin();
+    if(!cart.length){
+
+        toast("Cart is empty.");
+
         return;
     }
 
-    if(cart.length===0){
-        toast("Cart is empty");
-        return;
-    }
 
-    const name=document.getElementById("deliveryName").value.trim();
-    const phone=document.getElementById("deliveryPhone").value.trim();
-    const address=document.getElementById("deliveryAddress").value.trim();
-    const city=document.getElementById("deliveryCity").value.trim();
-    const pin=document.getElementById("deliveryPin").value.trim();
+    const name =
+        document.getElementById("checkoutName").value.trim();
 
-    const payment=document.querySelector(
-        'input[name="payment"]:checked'
-    );
+    const phone =
+        document.getElementById("checkoutPhone").value.trim();
+
+    const address =
+        document.getElementById("checkoutAddress").value.trim();
+
+    const city =
+        document.getElementById("checkoutCity").value.trim();
+
+    const pin =
+        document.getElementById("checkoutPin").value.trim();
+
 
     if(!name || !phone || !address || !city || !pin){
-        toast("Please fill all delivery details");
+
+        toast("Please fill all delivery details.");
+
         return;
     }
 
-    if(!/^\d{10}$/.test(phone)){
-        toast("Enter valid 10 digit phone number");
-        return;
-    }
 
-    if(!/^\d{6}$/.test(pin)){
-        toast("Enter valid 6 digit PIN");
-        return;
-    }
+    const payment =
+        document.querySelector(
+            'input[name="payment"]:checked'
+        );
 
-    if(!payment){
-        toast("Please select payment method");
-        return;
-    }
 
-    const items=cart.map(item=>{
+    let total = 0;
 
-        const p=products.find(x=>x.id===item.id);
+    const items =
+        cart.map(item => {
 
-        return {
-            id:p.id,
-            name:p.name,
-            price:p.price,
-            qty:item.qty,
-            emoji:p.emoji,
-            image:p.image
-        };
-    });
+            const product =
+                products.find(p => p.id === item.id);
 
-    const total=items.reduce(
-        (sum,item)=>sum+item.price*item.qty,0
-    );
+            const itemTotal =
+                product.price * item.qty;
 
-    const order={
-        id:"ECW"+Date.now().toString().slice(-8),
-        user:currentUser.phone,
+            total += itemTotal;
+
+            return {
+                id:product.id,
+                name:product.name,
+                price:product.price,
+                qty:item.qty,
+                image:product.image,
+                emoji:product.emoji
+            };
+
+        });
+
+
+    const order = {
+
+        id:
+            "ECW" +
+            Date.now().toString().slice(-8),
+
+        user:
+            currentUser
+            ? currentUser.phone
+            : phone,
+
         customerName:name,
+
         phone:phone,
+
         address:address,
+
         city:city,
+
         pin:pin,
+
         payment:payment.value,
+
         items:items,
+
         total:total,
-        date:new Date().toLocaleString("en-IN"),
+
+        date:
+            new Date().toLocaleString("en-IN"),
+
         status:0
+
     };
+
 
     orders.unshift(order);
 
-    cart=[];
+    cart = [];
 
     saveData();
+
     updateCartCount();
 
-    generateBill(order);
 
     showSuccess(order);
+
 }
 
+
+/* ================================
+   ORDER SUCCESS
+================================ */
 
 function showSuccess(order){
 
-    document.getElementById("billContent").innerHTML=`
+    showSection("orders");
+
+    const area =
+        document.getElementById("ordersArea");
+
+    area.innerHTML = `
 
         <div class="success-card">
 
-            <div class="success-icon">✓</div>
-
-            <h1>Order Placed Successfully!</h1>
-
-            <p>Thank you for shopping with ECW ❤️</p>
-
-            <h3>Order ID: ${order.id}</h3>
-
-            <p>Total: ₹${Number(order.total).toLocaleString("en-IN")}</p>
-
-            <button class="primary"
-                onclick="showSection('orders')">
-                Track Order 📦
-            </button>
-
-            <button class="secondary"
-                onclick="showSection('bill')">
-                View Invoice 🧾
-            </button>
-
-        </div>
-    `;
-
-    showSection("bill");
-
-    toast("Order placed successfully 🎉");
-}
-
-
-/* =========================
-   ORDERS
-========================= */
-
-function displayOrders(){
-
-    const area=document.getElementById("ordersArea");
-
-    if(!area)return;
-
-    if(!currentUser){
-
-        area.innerHTML=`
-            <div class="empty">
-                <div>🔐</div>
-                <h3>Please login</h3>
-                <button class="primary" onclick="openLogin()">
-                    Login
-                </button>
-            </div>`;
-
-        return;
-    }
-
-    const myOrders=orders.filter(
-        o=>o.user===currentUser.phone
-    );
-
-    if(myOrders.length===0){
-
-        area.innerHTML=`
-            <div class="empty">
-                <div>📦</div>
-                <h3>No orders yet</h3>
-                <button class="primary"
-                    onclick="showSection('products')">
-                    Start Shopping
-                </button>
-            </div>`;
-
-        return;
-    }
-
-    area.innerHTML=myOrders.map(order=>`
-
-        <div class="order-card">
-
-            <div class="order-top">
-                <div>
-                    <div class="order-id">#${order.id}</div>
-                    <small>${order.date}</small>
-                </div>
-
-                <span class="status">
-                    ${statusText(order.status)}
-                </span>
+            <div class="success-icon">
+                ✓
             </div>
 
-            <div class="tracking">
-                ${trackingHTML(order.status)}
-            </div>
+            <h2>Order Placed Successfully!</h2>
 
-            <p><b>Payment:</b> ${paymentName(order.payment)}</p>
-
-            <p><b>Total:</b>
-                ₹${Number(order.total).toLocaleString("en-IN")}
+            <p>
+                Thank you for shopping with ECW ❤️
             </p>
 
-            <button class="secondary"
+            <p>
+                Order ID:
+                <strong>${order.id}</strong>
+            </p>
+
+            <br>
+
+            <button
+                class="primary"
+                onclick="trackOrder('${order.id}')">
+                📦 Track Order
+            </button>
+
+            <button
+                class="secondary"
                 onclick="generateBill(orders.find(o=>o.id==='${order.id}'))">
                 🧾 View Invoice
             </button>
 
         </div>
 
-    `).join("");
+    `;
+
+    displayOrders();
+
+    toast("Order placed successfully 🎉");
 }
+
+
+/* ================================
+   ORDERS
+================================ */
+
+function displayOrders(){
+
+    const area =
+        document.getElementById("ordersArea");
+
+    if(!area) return;
+
+
+    let myOrders = orders;
+
+    if(currentUser){
+
+        myOrders =
+            orders.filter(
+                order =>
+                    order.user === currentUser.phone
+            );
+
+    }
+
+
+    if(!myOrders.length){
+
+        area.innerHTML = `
+            <div class="form-card">
+                <h3>No orders yet 📦</h3>
+                <button
+                    class="primary"
+                    onclick="showSection('products')">
+                    Start Shopping
+                </button>
+            </div>
+        `;
+
+        return;
+    }
+
+
+    area.innerHTML =
+        myOrders.map(order => {
+
+            return `
+
+                <div class="order-card">
+
+                    <div class="order-head">
+
+                        <div>
+                            <h3>
+                                Order ${order.id}
+                            </h3>
+
+                            <p class="small">
+                                ${order.date}
+                            </p>
+                        </div>
+
+                        <span class="status-badge">
+                            ${statusText(order.status)}
+                        </span>
+
+                    </div>
+
+
+                    <div class="order-items">
+
+                        ${
+                            order.items.map(item => `
+
+                                <div class="order-item">
+
+                                    <span>
+                                        ${item.emoji || "🛍️"}
+                                        ${item.name}
+                                        × ${item.qty}
+                                    </span>
+
+                                    <strong>
+                                        ₹${(
+                                            item.price *
+                                            item.qty
+                                        ).toLocaleString("en-IN")}
+                                    </strong>
+
+                                </div>
+
+                            `).join("")
+                        }
+
+                    </div>
+
+
+                    <h3>
+                        Total:
+                        ₹${order.total.toLocaleString("en-IN")}
+                    </h3>
+
+                    <p>
+                        Payment:
+                        ${paymentName(order.payment)}
+                    </p>
+
+                    <br>
+
+
+                    <button
+                        class="track-button"
+                        onclick="trackOrder('${order.id}')">
+                        📦 Track Order
+                    </button>
+
+                    <button
+                        class="secondary"
+                        onclick="generateBill(
+                            orders.find(o=>o.id==='${order.id}')
+                        )">
+                        🧾 View Invoice
+                    </button>
+
+                </div>
+
+            `;
+
+        }).join("");
+
+}
+
+
+/* ================================
+   ORDER STATUS
+================================ */
+
+const orderStatuses = [
+
+    "Placed",
+
+    "Confirmed",
+
+    "Shipped",
+
+    "Out for Delivery",
+
+    "Delivered"
+
+];
 
 
 function statusText(status){
 
-    const names=[
-        "Order Placed",
-        "Confirmed",
-        "Shipped",
-        "Out for Delivery",
-        "Delivered"
-    ];
+    return orderStatuses[status] ||
+        "Placed";
 
-    return names[status] || names[0];
+}
+
+
+/* ================================
+   TRACK ORDER
+================================ */
+
+function trackOrder(id){
+
+    currentTrackingOrderId = id;
+
+    const order =
+        orders.find(
+            order => order.id === id
+        );
+
+    if(!order){
+
+        toast("Order not found.");
+
+        return;
+    }
+
+
+    const content =
+        document.getElementById(
+            "trackingContent"
+        );
+
+
+    content.innerHTML = `
+
+        <p class="small-title">
+            ORDER TRACKING
+        </p>
+
+        <h2>📦 Track Your Order</h2>
+
+        <p>
+            <strong>Order ID:</strong>
+            ${order.id}
+        </p>
+
+        <p class="small">
+            Ordered on ${order.date}
+        </p>
+
+
+        <div class="tracking">
+
+            ${trackingHTML(order.status)}
+
+        </div>
+
+
+        <div class="form-card">
+
+            <h3>
+                Current Status:
+                ${statusText(order.status)}
+            </h3>
+
+            <p>
+                ${
+                    order.status === 0
+                    ? "Your order has been placed successfully."
+                    :
+                    order.status === 1
+                    ? "Your order has been confirmed."
+                    :
+                    order.status === 2
+                    ? "Your order has been shipped."
+                    :
+                    order.status === 3
+                    ? "Your order is out for delivery."
+                    :
+                    "Your order has been delivered successfully."
+                }
+            </p>
+
+        </div>
+
+
+        <div class="form-card">
+
+            <h3>Delivery Address</h3>
+
+            <p>${order.customerName}</p>
+
+            <p>${order.phone}</p>
+
+            <p>
+                ${order.address},
+                ${order.city} -
+                ${order.pin}
+            </p>
+
+        </div>
+
+
+        <div class="form-card">
+
+            <h3>Order Summary</h3>
+
+            ${
+                order.items.map(item => `
+
+                    <div class="order-item">
+
+                        <span>
+                            ${item.emoji || "🛍️"}
+                            ${item.name}
+                            × ${item.qty}
+                        </span>
+
+                        <strong>
+                            ₹${(
+                                item.price *
+                                item.qty
+                            ).toLocaleString("en-IN")}
+                        </strong>
+
+                    </div>
+
+                `).join("")
+            }
+
+            <hr>
+
+            <h3>
+                Total:
+                ₹${order.total.toLocaleString("en-IN")}
+            </h3>
+
+        </div>
+
+        <button
+            class="primary full"
+            onclick="closeTracking()">
+            Close
+        </button>
+
+    `;
+
+
+    document.getElementById(
+        "trackingModal"
+    ).classList.add("show");
+
 }
 
 
 function trackingHTML(status){
 
-    const names=[
-        ["✓","Placed"],
-        ["✓","Confirmed"],
-        ["🚚","Shipped"],
-        ["📍","Out for Delivery"],
-        ["✓","Delivered"]
-    ];
+    return orderStatuses.map(
+        (name,index) => {
 
-    return names.map((x,i)=>`
+            let className = "";
 
-        <div class="track-step ${i<=status?"done":""}">
+            if(index < status)
+                className = "done";
 
-            <div class="track-dot">${x[0]}</div>
+            if(index === status)
+                className = "current";
 
-            <span>${x[1]}</span>
+            return `
 
-        </div>
+                <div class="track-step ${className}">
 
-    `).join("");
+                    <div class="track-dot">
+
+                        ${
+                            index <= status
+                            ? "✓"
+                            : index + 1
+                        }
+
+                    </div>
+
+                    <p>${name}</p>
+
+                </div>
+
+            `;
+
+        }
+    ).join("");
+
 }
 
 
-function paymentName(value){
+function closeTracking(){
 
-    return {
-        COD:"Cash on Delivery",
-        UPI:"UPI",
-        CARD:"Credit / Debit Card",
-        NET:"Net Banking"
-    }[value] || value;
+    document.getElementById(
+        "trackingModal"
+    ).classList.remove("show");
+
 }
 
 
-/* =========================
-   WISHLIST
-========================= */
-
-function toggleWishlist(id){
-
-    if(wishlist.includes(id)){
-
-        wishlist=wishlist.filter(x=>x!==id);
-        toast("Removed from wishlist");
-
-    }else{
-
-        wishlist.push(id);
-        toast("Added to wishlist ❤️");
-    }
-
-    saveData();
-
-    displayProducts();
-    displayWishlist();
-    displayProfile();
-}
-
-
-function displayWishlist(){
-
-    const area=document.getElementById("wishlistArea");
-
-    if(!area)return;
-
-    const items=products.filter(
-        p=>wishlist.includes(p.id)
-    );
-
-    if(items.length===0){
-
-        area.innerHTML=`
-            <div class="empty">
-                <div>❤️</div>
-                <h3>Your wishlist is empty</h3>
-                <p>Save products you love.</p>
-            </div>`;
-
-        return;
-    }
-
-    area.innerHTML=`
-        <div class="product-grid">
-            ${items.map(productCard).join("")}
-        </div>
-    `;
-}
-
-
-/* =========================
-   PROFILE
-========================= */
-
-function displayProfile(){
-
-    if(!currentUser){
-
-        document.getElementById("profileName").textContent="Guest";
-        document.getElementById("profilePhone").textContent=
-            "Please login to view your profile.";
-
-        return;
-    }
-
-    document.getElementById("profileName").textContent=
-        currentUser.name;
-
-    document.getElementById("profilePhone").textContent=
-        "📱 "+currentUser.phone;
-
-    const myOrders=orders.filter(
-        o=>o.user===currentUser.phone
-    );
-
-    const spent=myOrders.reduce(
-        (sum,o)=>sum+o.total,0
-    );
-
-    document.getElementById("profileOrders").textContent=
-        myOrders.length;
-
-    document.getElementById("profileWishlist").textContent=
-        wishlist.length;
-
-    document.getElementById("profileSpent").textContent=
-        "₹"+Number(spent).toLocaleString("en-IN");
-}
-
-
-/* =========================
-   LOGIN / SIGNUP
-========================= */
-
-function openLogin(){
-
-    document.getElementById("authModal").classList.add("show");
-
-    showLogin();
-}
-
-
-function closeAuth(){
-
-    document.getElementById("authModal").classList.remove("show");
-}
-
-
-function showLogin(){
-
-    document.getElementById("loginForm").classList.remove("hidden");
-    document.getElementById("signupForm").classList.add("hidden");
-    document.getElementById("otpForm").classList.add("hidden");
-}
-
-
-function showSignup(){
-
-    document.getElementById("loginForm").classList.add("hidden");
-    document.getElementById("signupForm").classList.remove("hidden");
-    document.getElementById("otpForm").classList.add("hidden");
-}
-
-
-function login(){
-
-    const phone=document.getElementById("loginPhone").value.trim();
-    const password=document.getElementById("loginPassword").value;
-
-    if(!/^\d{10}$/.test(phone)){
-        toast("Enter valid phone number");
-        return;
-    }
-
-    const user=users.find(
-        u=>u.phone===phone && u.password===password
-    );
-
-    if(!user){
-        toast("Invalid phone number or password");
-        return;
-    }
-
-    currentUser=user;
-
-    saveData();
-
-    closeAuth();
-    updateHeader();
-    displayProfile();
-
-    toast("Welcome back, "+user.name+" 👋");
-}
-
-
-function signup(){
-
-    const name=document.getElementById("signupName").value.trim();
-    const phone=document.getElementById("signupPhone").value.trim();
-    const password=document.getElementById("signupPassword").value;
-
-    if(!name || !phone || !password){
-        toast("Please fill all fields");
-        return;
-    }
-
-    if(!/^\d{10}$/.test(phone)){
-        toast("Enter valid 10 digit phone number");
-        return;
-    }
-
-    if(password.length<4){
-        toast("Password must contain at least 4 characters");
-        return;
-    }
-
-    if(users.some(u=>u.phone===phone)){
-        toast("Phone number already registered");
-        return;
-    }
-
-    pendingSignup={
-        name:name,
-        phone:phone,
-        password:password
-    };
-
-    document.getElementById("signupForm").classList.add("hidden");
-    document.getElementById("otpForm").classList.remove("hidden");
-
-    toast("OTP sent! Use 1234 for prototype.");
-}
-
-
-function verifyOTP(){
-
-    const otp=document.getElementById("otpInput").value.trim();
-
-    if(otp!=="1234"){
-        toast("Invalid OTP");
-        return;
-    }
-
-    users.push(pendingSignup);
-
-    currentUser=pendingSignup;
-
-    pendingSignup=null;
-
-    saveData();
-
-    closeAuth();
-
-    updateHeader();
-    displayProfile();
-
-    toast("Account created successfully 🎉");
-}
-
-
-function logout(){
-
-    currentUser=null;
-
-    saveData();
-    updateHeader();
-
-    toast("Logged out successfully");
-}
-
-
-function updateHeader(){
-
-    const login=document.getElementById("loginNav");
-    const logout=document.getElementById("logoutNav");
-
-    if(currentUser){
-
-        login.classList.add("hidden");
-        logout.classList.remove("hidden");
-
-    }else{
-
-        login.classList.remove("hidden");
-        logout.classList.add("hidden");
-    }
-}
-
-
-/* =========================
-   OWNER
-========================= */
+/* ================================
+   OWNER LOGIN
+================================ */
 
 function ownerLogin(){
 
-    const phone=document.getElementById("ownerPhone").value.trim();
-    const password=document.getElementById("ownerPassword").value;
+    const phone =
+        document.getElementById("ownerPhone").value;
 
-    if(phone===OWNER_PHONE && password===OWNER_PASSWORD){
+    const password =
+        document.getElementById("ownerPassword").value;
 
-        ownerActive=true;
 
-        document.getElementById("ownerLoginBox")
-            .classList.add("hidden");
+    if(
+        phone === "9999999999" &&
+        password === "owner123"
+    ){
 
-        document.getElementById("ownerDashboard")
-            .classList.remove("hidden");
+        sessionStorage.setItem(
+            "ecwOwner",
+            "true"
+        );
 
-        updateOwner();
+        checkOwner();
 
-        toast("Owner login successful 👨‍💼");
+        toast("Owner login successful.");
 
     }else{
 
-        toast("Invalid owner credentials");
+        toast("Invalid owner credentials.");
+
     }
+
+}
+
+
+function checkOwner(){
+
+    const logged =
+        sessionStorage.getItem("ecwOwner") === "true";
+
+
+    document.getElementById(
+        "ownerLoginArea"
+    ).classList.toggle(
+        "hidden",
+        logged
+    );
+
+
+    document.getElementById(
+        "ownerDashboard"
+    ).classList.toggle(
+        "hidden",
+        !logged
+    );
+
+
+    if(logged){
+
+        updateOwnerStats();
+
+        displayManageProducts();
+
+        displayManageOrders();
+
+    }
+
 }
 
 
 function ownerLogout(){
 
-    ownerActive=false;
+    sessionStorage.removeItem("ecwOwner");
 
-    document.getElementById("ownerLoginBox")
-        .classList.remove("hidden");
+    checkOwner();
 
-    document.getElementById("ownerDashboard")
-        .classList.add("hidden");
 }
 
 
-function updateOwner(){
+function updateOwnerStats(){
 
-    if(!ownerActive)return;
+    const sales =
+        orders.reduce(
+            (sum,order) =>
+                sum + Number(order.total),
+            0
+        );
 
-    document.getElementById("statProducts").textContent=
-        products.length;
 
-    document.getElementById("statOrders").textContent=
-        orders.length;
+    document.getElementById(
+        "statProducts"
+    ).textContent = products.length;
 
-    document.getElementById("statCustomers").textContent=
-        users.length;
 
-    const sales=orders.reduce(
-        (sum,o)=>sum+o.total,0
-    );
+    document.getElementById(
+        "statUsers"
+    ).textContent = users.length;
 
-    document.getElementById("statSales").textContent=
-        "₹"+Number(sales).toLocaleString("en-IN");
+
+    document.getElementById(
+        "statOrders"
+    ).textContent = orders.length;
+
+
+    document.getElementById(
+        "statSales"
+    ).textContent =
+        "₹" +
+        sales.toLocaleString("en-IN");
+
+}
+
+
+/* ================================
+   OWNER PRODUCT MANAGEMENT
+================================ */
+
+function saveProduct(){
+
+    const name =
+        document.getElementById("productName")
+            .value.trim();
+
+    const category =
+        document.getElementById("productCategory")
+            .value;
+
+    const price =
+        Number(
+            document.getElementById("productPrice")
+                .value
+        );
+
+    const description =
+        document.getElementById("productDescription")
+            .value.trim();
+
+    const emoji =
+        document.getElementById("productEmoji")
+            .value;
+
+    const editId =
+        document.getElementById("editProductId")
+            .value;
+
+
+    if(!name || !price){
+
+        toast("Enter product name and price.");
+
+        return;
+    }
+
+
+    if(editId){
+
+        const product =
+            products.find(
+                p => p.id === Number(editId)
+            );
+
+        if(product){
+
+            product.name = name;
+            product.category = category;
+            product.price = price;
+            product.description = description;
+            product.emoji = emoji;
+
+            if(selectedImage)
+                product.image = selectedImage;
+
+        }
+
+        toast("Product updated successfully.");
+
+    }else{
+
+        products.push({
+
+            id:Date.now(),
+
+            name:name,
+
+            category:category,
+
+            price:price,
+
+            description:description,
+
+            emoji:emoji,
+
+            image:selectedImage || ""
+
+        });
+
+        toast("Product added successfully.");
+
+    }
+
+
+    saveData();
+
+    resetProductForm();
+
+    displayProducts();
 
     displayManageProducts();
+
+    updateOwnerStats();
+
 }
 
 
 function displayManageProducts(){
 
-    const area=document.getElementById("manageProducts");
-
-    if(products.length===0){
-        area.innerHTML="<p class='no-data'>No products.</p>";
-        return;
-    }
-
-    area.innerHTML=products.map(p=>{
-
-        const image=p.image
-            ? `<img src="${p.image}">`
-            : p.emoji;
-
-        return `
-            <div class="manage-item">
-
-                <div class="manage-img">
-                    ${image}
-                </div>
-
-                <div class="manage-text">
-                    <b>${p.name}</b>
-                    <small>
-                        ${p.category} • ₹${Number(p.price).toLocaleString("en-IN")}
-                    </small>
-                </div>
-
-                <div class="manage-actions">
-
-                    <button class="edit"
-                        onclick="editProduct(${p.id})">
-                        ✏️
-                    </button>
-
-                    <button class="danger"
-                        onclick="deleteProduct(${p.id})">
-                        🗑️
-                    </button>
-
-                </div>
-
-            </div>
-        `;
-    }).join("");
-}
-
-
-/* =========================
-   IMAGE UPLOAD
-========================= */
-
-function previewImage(event){
-
-    const file=event.target.files[0];
-
-    if(!file)return;
-
-    const reader=new FileReader();
-
-    reader.onload=function(e){
-
-        selectedImage=e.target.result;
-
-        document.getElementById("imagePreview").innerHTML=`
-            <img src="${selectedImage}">
-        `;
-    };
-
-    reader.readAsDataURL(file);
-}
-
-
-/* =========================
-   ADD / EDIT PRODUCT
-========================= */
-
-function saveProduct(){
-
-    const name=document.getElementById("productName").value.trim();
-    const category=document.getElementById("productCategory").value;
-    const price=Number(document.getElementById("productPrice").value);
-    const description=document.getElementById("productDescription").value.trim();
-    const emoji=document.getElementById("productEmoji").value;
-    const editId=document.getElementById("editProductId").value;
-
-    if(!name || !price || !description){
-        toast("Fill all product details");
-        return;
-    }
-
-    if(editId){
-
-        const p=products.find(
-            x=>x.id===Number(editId)
+    const area =
+        document.getElementById(
+            "manageProducts"
         );
 
-        if(p){
+    if(!area) return;
 
-            p.name=name;
-            p.category=category;
-            p.price=price;
-            p.description=description;
-            p.emoji=emoji;
 
-            if(selectedImage){
-                p.image=selectedImage;
-            }
+    area.innerHTML =
+        products.map(product => `
 
-            toast("Product updated ✏️");
-        }
+            <div class="manage-product">
 
-    }else{
+                ${
+                    product.image
+                    ?
+                    `<img src="${product.image}">`
+                    :
+                    `<div style="font-size:35px">
+                        ${product.emoji}
+                    </div>`
+                }
 
-        products.push({
-            id:Date.now(),
-            name:name,
-            category:category,
-            price:price,
-            description:description,
-            emoji:emoji,
-            image:selectedImage
-        });
+                <div style="flex:1">
 
-        toast("Product added successfully 🎉");
-    }
+                    <strong>
+                        ${product.name}
+                    </strong>
 
-    saveData();
+                    <p class="small">
+                        ${product.category}
+                        · ₹${product.price}
+                    </p>
 
-    resetProductForm();
-    displayProducts();
-    updateOwner();
+                </div>
+
+                <button
+                    class="secondary"
+                    onclick="editProduct(${product.id})">
+                    Edit
+                </button>
+
+                <button
+                    class="primary danger"
+                    onclick="deleteProduct(${product.id})">
+                    Delete
+                </button>
+
+            </div>
+
+        `).join("");
+
 }
 
 
 function editProduct(id){
 
-    const p=products.find(x=>x.id===id);
+    const product =
+        products.find(p => p.id === id);
 
-    if(!p)return;
+    if(!product) return;
 
-    document.getElementById("editProductId").value=p.id;
-    document.getElementById("productName").value=p.name;
-    document.getElementById("productCategory").value=p.category;
-    document.getElementById("productPrice").value=p.price;
-    document.getElementById("productDescription").value=p.description;
-    document.getElementById("productEmoji").value=p.emoji;
 
-    selectedImage=p.image || "";
+    document.getElementById(
+        "editProductId"
+    ).value = product.id;
 
-    document.getElementById("productFormTitle").textContent=
+
+    document.getElementById(
+        "productName"
+    ).value = product.name;
+
+
+    document.getElementById(
+        "productCategory"
+    ).value = product.category;
+
+
+    document.getElementById(
+        "productPrice"
+    ).value = product.price;
+
+
+    document.getElementById(
+        "productDescription"
+    ).value =
+        product.description || "";
+
+
+    document.getElementById(
+        "productEmoji"
+    ).value =
+        product.emoji || "🛍️";
+
+
+    selectedImage =
+        product.image || "";
+
+
+    document.getElementById(
+        "productFormTitle"
+    ).textContent =
         "Edit Product";
 
-    document.getElementById("cancelEdit")
-        .classList.remove("hidden");
 
-    if(p.image){
-
-        document.getElementById("imagePreview").innerHTML=
-            `<img src="${p.image}">`;
-    }
-
-    document.getElementById("productName")
-        .scrollIntoView({behavior:"smooth"});
-}
+    document.getElementById(
+        "cancelEdit"
+    ).classList.remove("hidden");
 
 
-function resetProductForm(){
+    document.getElementById(
+        "owner"
+    ).scrollIntoView({
+        behavior:"smooth"
+    });
 
-    document.getElementById("editProductId").value="";
-    document.getElementById("productName").value="";
-    document.getElementById("productPrice").value="";
-    document.getElementById("productDescription").value="";
-    document.getElementById("productImage").value="";
-    document.getElementById("imagePreview").innerHTML="";
-
-    selectedImage="";
-
-    document.getElementById("productFormTitle").textContent=
-        "Add New Product";
-
-    document.getElementById("cancelEdit")
-        .classList.add("hidden");
 }
 
 
 function deleteProduct(id){
 
-    const p=products.find(x=>x.id===id);
+    if(!confirm(
+        "Delete this product?"
+    )) return;
 
-    if(!p)return;
 
-    if(!confirm(`Delete ${p.name}?`))return;
+    products =
+        products.filter(
+            p => p.id !== id
+        );
 
-    products=products.filter(x=>x.id!==id);
 
-    cart=cart.filter(x=>x.id!==id);
+    cart =
+        cart.filter(
+            item => item.id !== id
+        );
 
-    wishlist=wishlist.filter(x=>x!==id);
+
+    wishlist =
+        wishlist.filter(
+            item => item !== id
+        );
+
 
     saveData();
 
-    updateCartCount();
     displayProducts();
-    displayCart();
-    displayWishlist();
-    updateOwner();
 
-    toast("Product deleted");
+    displayManageProducts();
+
+    updateCartCount();
+
+    updateOwnerStats();
+
+    toast("Product deleted.");
+
 }
 
 
-/* =========================
-   BILL / INVOICE
-========================= */
+function resetProductForm(){
 
-function generateBill(order){
+    document.getElementById(
+        "editProductId"
+    ).value = "";
 
-    if(!order)return;
 
-    const subtotal=order.total;
-    const gst=0;
-    const grand=order.total;
+    document.getElementById(
+        "productName"
+    ).value = "";
 
-    document.getElementById("billContent").innerHTML=`
 
-        <div class="bill">
+    document.getElementById(
+        "productPrice"
+    ).value = "";
 
-            <div class="bill-header">
 
-                <div>
-                    <h1>✦ ECW</h1>
-                    <p>Everything You Need</p>
-                    <p>Smart Shopping. Simple Living.</p>
-                </div>
+    document.getElementById(
+        "productDescription"
+    ).value = "";
 
-                <div>
-                    <b>INVOICE</b>
-                    <p>#${order.id}</p>
-                    <p>${order.date}</p>
+
+    document.getElementById(
+        "productImage"
+    ).value = "";
+
+
+    document.getElementById(
+        "imagePreview"
+    ).innerHTML = "";
+
+
+    document.getElementById(
+        "productFormTitle"
+    ).textContent =
+        "Add New Product";
+
+
+    document.getElementById(
+        "cancelEdit"
+    ).classList.add("hidden");
+
+
+    selectedImage = "";
+
+}
+
+
+/* ================================
+   IMAGE UPLOAD + COMPRESSION
+================================ */
+
+function previewImage(event){
+
+    const file =
+        event.target.files[0];
+
+    if(!file) return;
+
+
+    if(!file.type.startsWith("image/")){
+
+        toast("Please select an image.");
+
+        return;
+    }
+
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload = function(e){
+
+        const img = new Image();
+
+
+        img.onload = function(){
+
+            const canvas =
+                document.createElement("canvas");
+
+            const max = 700;
+
+            let width = img.width;
+            let height = img.height;
+
+
+            if(width > height){
+
+                if(width > max){
+
+                    height =
+                        height * max / width;
+
+                    width = max;
+
+                }
+
+            }else{
+
+                if(height > max){
+
+                    width =
+                        width * max / height;
+
+                    height = max;
+
+                }
+
+            }
+
+
+            canvas.width = width;
+            canvas.height = height;
+
+
+            const ctx =
+                canvas.getContext("2d");
+
+
+            ctx.drawImage(
+                img,
+                0,
+                0,
+                width,
+                height
+            );
+
+
+            selectedImage =
+                canvas.toDataURL(
+                    "image/jpeg",
+                    0.75
+                );
+
+
+            document.getElementById(
+                "imagePreview"
+            ).innerHTML = `
+
+                <img src="${selectedImage}"
+                     alt="Preview">
+
+            `;
+
+        };
+
+
+        img.src = e.target.result;
+
+    };
+
+
+    reader.readAsDataURL(file);
+
+}
+
+
+/* ================================
+   OWNER ORDER TRACKING
+================================ */
+
+function displayManageOrders(){
+
+    const area =
+        document.getElementById(
+            "manageOrders"
+        );
+
+    if(!area) return;
+
+
+    if(!orders.length){
+
+        area.innerHTML =
+            "<p>No orders available.</p>";
+
+        return;
+    }
+
+
+    area.innerHTML =
+        orders.map(order => `
+
+            <div class="manage-order">
+
+                <div class="manage-order-row">
+
+                    <div>
+
+                        <strong>
+                            ${order.id}
+                        </strong>
+
+                        <p class="small">
+                            ${order.customerName}
+                            · ₹${order.total}
+                        </p>
+
+                    </div>
+
+
+                    <div>
+
+                        <select
+                            id="status-${order.id}">
+
+                            ${orderStatuses.map(
+                                (status,index) => `
+
+                                <option
+                                    value="${index}"
+                                    ${
+                                        Number(order.status)
+                                        === index
+                                        ? "selected"
+                                        : ""
+                                    }>
+
+                                    ${status}
+
+                                </option>
+
+                            `).join("")}
+
+                        </select>
+
+                    </div>
+
+
+                    <button
+                        class="primary"
+                        onclick="updateOrderStatus('${order.id}')">
+                        Update Status
+                    </button>
+
+
+                    <button
+                        class="secondary"
+                        onclick="trackOrder('${order.id}')">
+                        View Tracking
+                    </button>
+
                 </div>
 
             </div>
+
+        `).join("");
+
+}
+
+
+function updateOrderStatus(orderId){
+
+    const order =
+        orders.find(
+            order => order.id === orderId
+        );
+
+    if(!order) return;
+
+
+    const select =
+        document.getElementById(
+            "status-" + orderId
+        );
+
+
+    order.status =
+        Number(select.value);
+
+
+    saveData();
+
+    displayManageOrders();
+
+    displayOrders();
+
+    updateOwnerStats();
+
+
+    toast(
+        "Order status updated to " +
+        statusText(order.status)
+    );
+
+}
+
+
+/* ================================
+   WISHLIST
+================================ */
+
+function toggleWishlist(id){
+
+    if(wishlist.includes(id)){
+
+        wishlist =
+            wishlist.filter(
+                item => item !== id
+            );
+
+        toast("Removed from wishlist.");
+
+    }else{
+
+        wishlist.push(id);
+
+        toast("Added to wishlist ❤️");
+
+    }
+
+
+    saveData();
+
+    displayProducts();
+
+    displayWishlist();
+
+}
+
+
+function displayWishlist(){
+
+    const area =
+        document.getElementById(
+            "wishlistArea"
+        );
+
+    if(!area) return;
+
+
+    const items =
+        products.filter(
+            product =>
+                wishlist.includes(product.id)
+        );
+
+
+    if(!items.length){
+
+        area.innerHTML =
+            "<p>Your wishlist is empty ❤️</p>";
+
+        return;
+    }
+
+
+    area.innerHTML =
+        items.map(productCard).join("");
+
+}
+
+
+/* ================================
+   PROFILE
+================================ */
+
+function displayProfile(){
+
+    const area =
+        document.getElementById(
+            "profileArea"
+        );
+
+    if(!area) return;
+
+
+    if(!currentUser){
+
+        area.innerHTML = `
+
+            <div class="form-card">
+
+                <h3>
+                    Please login to view profile.
+                </h3>
+
+                <button
+                    class="primary"
+                    onclick="openLogin()">
+                    Login
+                </button>
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    area.innerHTML = `
+
+        <div class="form-card">
+
+            <h3>Account Information</h3>
+
+            <p>
+                <strong>Name:</strong>
+                ${currentUser.name}
+            </p>
+
+            <p>
+                <strong>Phone:</strong>
+                ${currentUser.phone}
+            </p>
 
             <br>
 
-            <h3>Bill To</h3>
+            <button
+                class="secondary"
+                onclick="logout()">
+                Logout
+            </button>
 
-            <p>${order.customerName}</p>
-            <p>${order.phone}</p>
-            <p>${order.address}, ${order.city} - ${order.pin}</p>
+        </div>
 
-            <table class="bill-table">
+    `;
 
-                <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th>Qty</th>
-                        <th>Price</th>
-                        <th>Total</th>
-                    </tr>
-                </thead>
+}
 
-                <tbody>
 
-                    ${order.items.map(item=>`
+/* ================================
+   LOGIN / SIGNUP
+================================ */
 
-                        <tr>
-                            <td>${item.name}</td>
-                            <td>${item.qty}</td>
-                            <td>₹${Number(item.price).toLocaleString("en-IN")}</td>
-                            <td>₹${Number(item.price*item.qty).toLocaleString("en-IN")}</td>
-                        </tr>
+function openLogin(){
 
-                    `).join("")}
+    closeModal("signupModal");
 
-                </tbody>
+    document.getElementById(
+        "loginModal"
+    ).classList.add("show");
 
-            </table>
+}
 
-            <div class="bill-total">
+
+function openSignup(){
+
+    closeModal("loginModal");
+
+    document.getElementById(
+        "signupModal"
+    ).classList.add("show");
+
+}
+
+
+function closeModal(id){
+
+    document.getElementById(id)
+        .classList.remove("show");
+
+}
+
+
+function signup(){
+
+    const name =
+        document.getElementById(
+            "signupName"
+        ).value.trim();
+
+    const phone =
+        document.getElementById(
+            "signupPhone"
+        ).value.trim();
+
+    const password =
+        document.getElementById(
+            "signupPassword"
+        ).value;
+
+
+    if(!name || !phone || !password){
+
+        toast("Fill all fields.");
+
+        return;
+    }
+
+
+    if(users.some(
+        user => user.phone === phone
+    )){
+
+        toast("Account already exists.");
+
+        return;
+    }
+
+
+    users.push({
+        name,
+        phone,
+        password
+    });
+
+
+    saveData();
+
+    currentUser = {
+        name,
+        phone
+    };
+
+
+    localStorage.setItem(
+        STORAGE.user,
+        JSON.stringify(currentUser)
+    );
+
+
+    closeModal("signupModal");
+
+    updateLoginUI();
+
+    displayProfile();
+
+    showSection("products");
+
+    toast("Account created successfully 🎉");
+
+}
+
+
+function login(){
+
+    const phone =
+        document.getElementById(
+            "loginPhone"
+        ).value.trim();
+
+    const password =
+        document.getElementById(
+            "loginPassword"
+        ).value;
+
+
+    const user =
+        users.find(
+            user =>
+                user.phone === phone &&
+                user.password === password
+        );
+
+
+    if(!user){
+
+        toast("Invalid phone or password.");
+
+        return;
+    }
+
+
+    currentUser = {
+        name:user.name,
+        phone:user.phone
+    };
+
+
+    localStorage.setItem(
+        STORAGE.user,
+        JSON.stringify(currentUser)
+    );
+
+
+    closeModal("loginModal");
+
+    updateLoginUI();
+
+    displayProfile();
+
+    toast("Login successful 👋");
+
+}
+
+
+function logout(){
+
+    currentUser = null;
+
+    localStorage.removeItem(
+        STORAGE.user
+    );
+
+    updateLoginUI();
+
+    displayProfile();
+
+    toast("Logged out.");
+
+}
+
+
+function updateLoginUI(){
+
+    document.getElementById(
+        "loginNav"
+    ).classList.toggle(
+        "hidden",
+        !!currentUser
+    );
+
+
+    document.getElementById(
+        "logoutNav"
+    ).classList.toggle(
+        "hidden",
+        !currentUser
+    );
+
+}
+
+
+/* ================================
+   OTP DEMO
+================================ */
+
+function verifyOTP(){
+
+    const otp =
+        document.getElementById(
+            "otpInput"
+        ).value;
+
+
+    if(otp === "1234"){
+
+        closeModal("otpModal");
+
+        toast(
+            "Phone verified successfully."
+        );
+
+    }else{
+
+        toast("Invalid OTP.");
+
+    }
+
+}
+
+
+/* ================================
+   BILL / INVOICE
+================================ */
+
+function generateBill(order){
+
+    if(!order){
+
+        toast("Order not found.");
+
+        return;
+    }
+
+
+    const area =
+        document.getElementById(
+            "billArea"
+        );
+
+
+    area.innerHTML = `
+
+        <div class="form-card">
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                gap:20px;
+                flex-wrap:wrap;
+            ">
 
                 <div>
-                    <span>Subtotal</span>
-                    <b>₹${Number(subtotal).toLocaleString("en-IN")}</b>
+
+                    <h1>✦ ECW</h1>
+
+                    <p>
+                        Everything You Need
+                    </p>
+
                 </div>
 
                 <div>
-                    <span>GST</span>
-                    <b>₹${gst}</b>
-                </div>
 
-                <div>
-                    <span>Delivery</span>
-                    <b>FREE</b>
-                </div>
+                    <strong>INVOICE</strong>
 
-                <div class="bill-grand">
-                    <span>Total</span>
-                    <b>₹${Number(grand).toLocaleString("en-IN")}</b>
+                    <p>
+                        Order:
+                        ${order.id}
+                    </p>
+
+                    <p>
+                        Date:
+                        ${order.date}
+                    </p>
+
                 </div>
 
             </div>
 
-            <p style="margin-top:25px">
-                <b>Payment:</b> ${paymentName(order.payment)}
+            <hr><br>
+
+
+            <h3>Customer Details</h3>
+
+            <p>
+                ${order.customerName}
             </p>
 
-            <p style="margin-top:20px;text-align:center">
-                ✓ Payment Confirmed
+            <p>
+                ${order.phone}
             </p>
 
-            <p style="text-align:center">
+            <p>
+                ${order.address},
+                ${order.city} -
+                ${order.pin}
+            </p>
+
+            <br>
+
+
+            <table style="
+                width:100%;
+                border-collapse:collapse;
+            ">
+
+                <tr>
+                    <th style="text-align:left">
+                        Product
+                    </th>
+
+                    <th>Qty</th>
+
+                    <th>Price</th>
+
+                    <th>Total</th>
+                </tr>
+
+
+                ${
+                    order.items.map(item => `
+
+                        <tr>
+
+                            <td>
+                                ${item.name}
+                            </td>
+
+                            <td style="text-align:center">
+                                ${item.qty}
+                            </td>
+
+                            <td style="text-align:center">
+                                ₹${item.price}
+                            </td>
+
+                            <td style="text-align:right">
+                                ₹${item.price * item.qty}
+                            </td>
+
+                        </tr>
+
+                    `).join("")
+                }
+
+            </table>
+
+            <hr><br>
+
+
+            <h2 style="text-align:right">
+                Total:
+                ₹${order.total.toLocaleString("en-IN")}
+            </h2>
+
+
+            <p class="success">
+                ✓ Payment Method:
+                ${paymentName(order.payment)}
+            </p>
+
+
+            <p style="text-align:center;margin-top:30px">
                 Thank you for shopping with ECW ❤️
             </p>
 
-            <button class="print-btn"
+
+            <button
+                class="primary"
                 onclick="window.print()">
                 🖨 Print / Save Bill
             </button>
 
+            <button
+                class="secondary"
+                onclick="showSection('orders')">
+                ← Back to Orders
+            </button>
+
         </div>
+
     `;
 
+
     showSection("bill");
+
 }
 
 
-/* =========================
+function paymentName(payment){
+
+    const names = {
+
+        COD:"Cash on Delivery",
+
+        UPI:"UPI",
+
+        CARD:"Credit / Debit Card",
+
+        NETBANKING:"Net Banking"
+
+    };
+
+    return names[payment] || payment;
+
+}
+
+
+/* ================================
    THEME
-========================= */
+================================ */
 
 function toggleTheme(){
 
     document.body.classList.toggle("dark");
 
+    const dark =
+        document.body.classList.contains("dark");
+
+
     localStorage.setItem(
-        "ecwTheme",
-        document.body.classList.contains("dark")
-            ? "dark"
-            : "light"
+        STORAGE.theme,
+        dark ? "dark" : "light"
     );
+
 }
 
 
-/* =========================
+/* ================================
    TOAST
-========================= */
-
-let toastTimer;
+================================ */
 
 function toast(message){
 
-    const box=document.getElementById("toast");
+    const box =
+        document.getElementById("toast");
 
-    box.textContent=message;
-    box.classList.add("show");
 
-    clearTimeout(toastTimer);
+    box.textContent = message;
 
-    toastTimer=setTimeout(()=>{
-        box.classList.remove("show");
-    },2500);
+    box.style.display = "block";
+
+
+    clearTimeout(
+        window.toastTimer
+    );
+
+
+    window.toastTimer =
+        setTimeout(() => {
+
+            box.style.display = "none";
+
+        },2500);
+
 }
 
 
-/* =========================
-   INITIALIZATION
-========================= */
+/* ================================
+   INITIALIZE
+================================ */
 
 function init(){
 
-    if(localStorage.getItem("ecwTheme")==="dark"){
-        document.body.classList.add("dark");
-    }
-
-    saveData();
+    fixProductImages();
 
     updateCartCount();
-    updateHeader();
+
     displayProducts();
-    displayCart();
+
+    displayOrders();
+
     displayWishlist();
+
     displayProfile();
 
-    document.getElementById("ownerDashboard")
-        .classList.add("hidden");
+    updateLoginUI();
 
-    document.getElementById("ownerLoginBox")
-        .classList.remove("hidden");
+
+    const theme =
+        localStorage.getItem(
+            STORAGE.theme
+        );
+
+
+    if(theme === "dark")
+        document.body.classList.add("dark");
+
+
+    checkOwner();
+
 }
 
-init();
+
+document.addEventListener(
+    "DOMContentLoaded",
+    init
+);
