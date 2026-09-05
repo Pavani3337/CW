@@ -21,21 +21,25 @@ const STORAGE = {
 
 const productImages = {
 
-    1:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80",
+    1:"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80",
 
-    2:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80",
+    2:"https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&w=800&q=80",
 
-    3:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80",
+    3:"https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=800&q=80",
 
-    4:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80",
+    4:"https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80",
 
-    5:"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80",
+    5:"https://images.unsplash.com/photo-1546868871-7041f2a3fca6?auto=format&fit=crop&w=800&q=80",
 
-    6:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=800&q=80",
+    6:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80",
 
-    7:"https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=800&q=80",
+    7:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80",
 
-    8:"https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80"
+    8:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80",
+
+    9:"https://images.unsplash.com/photo-1527814050087-3793815479db?auto=format&fit=crop&w=800&q=80",
+
+    10:"https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?auto=format&fit=crop&w=800&q=80"
 
 };
 
@@ -48,82 +52,102 @@ const defaultProducts = [
 
     {
         id:1,
-        name:"Wireless Headphones",
-        category:"Electronics",
-        price:1499,
-        description:"High-quality wireless headphones.",
-        emoji:"🎧",
+        name:"iPhone 15",
+        category:"Mobiles",
+        price:59999,
+        description:"Apple iPhone 15 with powerful performance and advanced camera features.",
+        emoji:"📱",
         image:productImages[1]
     },
 
     {
         id:2,
-        name:"Smart Watch",
-        category:"Electronics",
-        price:2499,
-        description:"Smart watch with useful features.",
-        emoji:"⌚",
+        name:"Samsung Galaxy S24",
+        category:"Mobiles",
+        price:74999,
+        description:"Samsung Galaxy S24 with a premium design, powerful processor and excellent camera.",
+        emoji:"📱",
         image:productImages[2]
     },
 
     {
         id:3,
-        name:"Running Shoes",
-        category:"Sports",
-        price:1999,
-        description:"Comfortable shoes for running.",
-        emoji:"👟",
+        name:"HP Pavilion Laptop",
+        category:"Laptops",
+        price:65999,
+        description:"HP Pavilion laptop suitable for study, work and everyday computing.",
+        emoji:"💻",
         image:productImages[3]
     },
 
     {
         id:4,
-        name:"Laptop Backpack",
-        category:"Fashion",
-        price:1299,
-        description:"Stylish and durable backpack.",
-        emoji:"🎒",
+        name:"MacBook Air",
+        category:"Laptops",
+        price:99999,
+        description:"Apple MacBook Air with a slim design and powerful performance.",
+        emoji:"💻",
         image:productImages[4]
     },
 
     {
         id:5,
-        name:"Smart Phone",
-        category:"Electronics",
-        price:15999,
-        description:"Modern smartphone for everyday use.",
-        emoji:"📱",
+        name:"Apple Watch",
+        category:"Watches",
+        price:42999,
+        description:"Apple Watch with smart features for fitness, communication and everyday use.",
+        emoji:"⌚",
         image:productImages[5]
     },
 
     {
         id:6,
-        name:"Cotton T-Shirt",
-        category:"Fashion",
-        price:699,
-        description:"Soft and comfortable cotton T-shirt.",
-        emoji:"👕",
+        name:"Running Shoes",
+        category:"Shoes",
+        price:2499,
+        description:"Comfortable and lightweight running shoes designed for everyday activity.",
+        emoji:"👟",
         image:productImages[6]
     },
 
     {
         id:7,
-        name:"Table Lamp",
-        category:"Home",
-        price:899,
-        description:"Beautiful lamp for your room.",
-        emoji:"💡",
+        name:"Wireless Headphones",
+        category:"Accessories",
+        price:2999,
+        description:"High-quality wireless headphones with comfortable design and clear sound.",
+        emoji:"🎧",
         image:productImages[7]
     },
 
     {
         id:8,
-        name:"Beauty Kit",
-        category:"Beauty",
-        price:999,
-        description:"Complete beauty care kit.",
-        emoji:"💄",
+        name:"Smart Backpack",
+        category:"Accessories",
+        price:1999,
+        description:"Stylish and durable smart backpack suitable for college, work and travel.",
+        emoji:"🎒",
         image:productImages[8]
+    },
+
+    {
+        id:9,
+        name:"Gaming Mouse",
+        category:"Accessories",
+        price:1499,
+        description:"Responsive gaming mouse designed for smooth and accurate control.",
+        emoji:"🖱️",
+        image:productImages[9]
+    },
+
+    {
+        id:10,
+        name:"Bluetooth Speaker",
+        category:"Accessories",
+        price:1799,
+        description:"Portable Bluetooth speaker with clear sound and convenient wireless connectivity.",
+        emoji:"🔊",
+        image:productImages[10]
     }
 
 ];
