@@ -10,10 +10,10 @@ const STORAGE = {
     orders:"ecwOrders",
     users:"ecwUsers",
     wishlist:"ecwWishlist",
+    feedback:"ecwFeedback",
     user:"ecwCurrentUser",
     theme:"ecwTheme"
 };
-
 
 /* ================================
    PRODUCT IMAGES
@@ -172,6 +172,9 @@ let users =
 let wishlist =
     JSON.parse(localStorage.getItem(STORAGE.wishlist)) || [];
 
+let feedback =
+    JSON.parse(localStorage.getItem(STORAGE.feedback)) || [];
+
 let currentUser =
     JSON.parse(localStorage.getItem(STORAGE.user)) || null;
 
@@ -238,6 +241,12 @@ function saveData(){
         STORAGE.wishlist,
         JSON.stringify(wishlist)
     );
+
+    localStorage.setItem(
+    STORAGE.feedback,
+    JSON.stringify(feedback)
+);
+
 
 }
 
@@ -361,6 +370,11 @@ function productCard(p){
 
                 <p>${p.description || ""}</p>
 
+		<div class="card-rating">
+    ${ratingSummaryShort(p.id)}
+</div>
+
+
                 <div class="product-actions">
 
                     <button
@@ -444,7 +458,6 @@ function viewProduct(id){
         <div class="detail-card">
 
             <div>
-
                 ${
                     product.image
                     ?
@@ -455,10 +468,9 @@ function viewProduct(id){
                     `
                     :
                     `<div class="product-image">
-                        ${product.emoji}
+                        ${product.emoji || "🛍️"}
                     </div>`
                 }
-
             </div>
 
             <div class="detail-info">
@@ -474,7 +486,7 @@ function viewProduct(id){
                         .toLocaleString("en-IN")}
                 </h2>
 
-                <p>${product.description}</p>
+                <p>${product.description || ""}</p>
 
                 <br>
 
@@ -500,10 +512,195 @@ function viewProduct(id){
 
         </div>
 
+        <div class="feedback-card">
+
+            <h2>⭐ Customer Feedback</h2>
+
+            <div id="ratingSummary">
+                ${ratingSummary(product.id)}
+            </div>
+
+            <hr>
+
+            <h3>Write a Review</h3>
+
+            ${
+                currentUser
+                ?
+                `
+                <div class="rating-input">
+
+                    <label>Your Rating</label>
+
+                    <select id="feedbackRating">
+
+                        <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+                        <option value="4">⭐⭐⭐⭐ Very Good</option>
+                        <option value="3">⭐⭐⭐ Good</option>
+                        <option value="2">⭐⭐ Fair</option>
+                        <option value="1">⭐ Poor</option>
+
+                    </select>
+
+                </div>
+
+                <textarea
+                    id="feedbackComment"
+                    placeholder="Share your experience with this product..."
+                    rows="4">
+                </textarea>
+
+                <button
+                    class="primary"
+                    onclick="submitFeedback(${product.id})">
+                    ⭐ Submit Feedback
+                </button>
+                `
+                :
+                `
+                <div class="login-feedback">
+                    <p>
+                        🔐 Please login to submit your feedback.
+                    </p>
+
+                    <button
+                        class="primary"
+                        onclick="openLogin()">
+                        Login
+                    </button>
+                </div>
+                `
+            }
+
+            <div id="feedbackList">
+                ${displayFeedback(product.id)}
+            </div>
+
+        </div>
     `;
 
     showSection("productDetails");
 }
+
+
+
+
+
+function ratingSummary(productId){
+
+    const reviews =
+        feedback.filter(
+            item => item.productId === productId
+        );
+
+    if(!reviews.length){
+
+        return `
+            <div class="rating-summary">
+                <strong>No ratings yet</strong>
+                <p>Be the first customer to review this product!</p>
+            </div>
+        `;
+    }
+
+    const total =
+        reviews.reduce(
+            (sum,item) => sum + Number(item.rating),
+            0
+        );
+
+    const average =
+        (total / reviews.length).toFixed(1);
+
+    return `
+        <div class="rating-summary">
+
+            <div class="big-rating">
+                ⭐ ${average}
+            </div>
+
+            <div>
+                <div class="stars">
+                    ${"⭐".repeat(Math.round(average))}
+                </div>
+
+                <p>
+                    Based on ${reviews.length}
+                    review${reviews.length > 1 ? "s" : ""}
+                </p>
+            </div>
+
+        </div>
+    `;
+}
+
+
+
+
+
+
+
+
+function displayFeedback(productId){
+
+    const reviews =
+        feedback
+            .filter(item => item.productId === productId)
+            .sort((a,b) =>
+                new Date(b.date) -
+                new Date(a.date)
+            );
+
+    if(!reviews.length){
+
+        return `
+            <div class="no-feedback">
+                💬 No customer reviews yet.
+            </div>
+        `;
+    }
+
+    return `
+        <div class="feedback-list">
+
+            ${reviews.map(review => `
+
+                <div class="feedback-item">
+
+                    <div class="feedback-header">
+
+                        <strong>
+                            ${review.userName}
+                        </strong>
+
+                        <span>
+                            ${"⭐".repeat(Number(review.rating))}
+                        </span>
+
+                    </div>
+
+                    <p>
+                        ${review.comment}
+                    </p>
+
+                    <small>
+                        ${new Date(review.date)
+                            .toLocaleDateString("en-IN")}
+                    </small>
+
+                </div>
+
+            `).join("")}
+
+        </div>
+    `;
+}
+
+
+
+
+
+
 
 
 /* ================================
@@ -1708,6 +1905,14 @@ function deleteProduct(id){
         );
 
 
+    feedback =
+    feedback.filter(
+        item => item.productId !== id
+    );
+
+
+
+
     saveData();
 
     displayProducts();
@@ -2647,3 +2852,106 @@ document.addEventListener(
     "DOMContentLoaded",
     init
 );
+
+
+
+
+
+function submitFeedback(productId){
+
+    if(!currentUser){
+
+        toast("Please login first.");
+        return;
+    }
+
+    const rating =
+        Number(
+            document.getElementById(
+                "feedbackRating"
+            ).value
+        );
+
+    const comment =
+        document.getElementById(
+            "feedbackComment"
+        ).value.trim();
+
+    if(!comment){
+
+        toast("Please write your feedback.");
+        return;
+    }
+
+    const existing =
+        feedback.find(
+            item =>
+                item.productId === productId &&
+                item.userPhone === currentUser.phone
+        );
+
+    if(existing){
+
+        existing.rating = rating;
+        existing.comment = comment;
+        existing.date = new Date().toISOString();
+
+        toast("Your feedback was updated ⭐");
+
+    }else{
+
+        feedback.push({
+
+            id:Date.now(),
+
+            productId:productId,
+
+            userPhone:currentUser.phone,
+
+            userName:currentUser.name,
+
+            rating:rating,
+
+            comment:comment,
+
+            date:new Date().toISOString()
+        });
+
+        toast("Feedback submitted successfully ⭐");
+    }
+
+    saveData();
+
+    viewProduct(productId);
+}
+
+
+
+
+
+
+function ratingSummaryShort(productId){
+
+    const reviews =
+        feedback.filter(
+            item => item.productId === productId
+        );
+
+    if(!reviews.length){
+        return "⭐ No reviews";
+    }
+
+    const total =
+        reviews.reduce(
+            (sum,item) => sum + Number(item.rating),
+            0
+        );
+
+    const average =
+        (total / reviews.length).toFixed(1);
+
+    return `
+        ⭐ ${average}
+        (${reviews.length})
+    `;
+}
