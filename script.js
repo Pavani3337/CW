@@ -202,14 +202,11 @@ function fixProductImages(){
             }
 
             return product;
-
         });
-
     }
 
     saveData();
 }
-
 
 /* ================================
    SAVE DATA
